@@ -59,12 +59,24 @@ public class PatientViewModel : BaseViewModel
     }
 
     // Onglet actif (navigation A→J)
+    private static readonly string[] _lettresOnglets = ["A","B","C","D","E","F","G","H","I","J"];
+
     private int _ongletActif;
     public int OngletActif
     {
         get => _ongletActif;
-        set => SetProperty(ref _ongletActif, value);
+        set
+        {
+            SetProperty(ref _ongletActif, value);
+            OnPropertyChanged(nameof(SelectedTabLetter));
+        }
     }
+
+    /// <summary>Lettre de l'onglet actif (A–J) passée à ImprimerSectionCommand.</summary>
+    public string SelectedTabLetter =>
+        _ongletActif >= 0 && _ongletActif < _lettresOnglets.Length
+            ? _lettresOnglets[_ongletActif]
+            : "A";
 
     // ── Permissions ───────────────────────────────────────────
     public bool EstMedecin => _authService.ARole(

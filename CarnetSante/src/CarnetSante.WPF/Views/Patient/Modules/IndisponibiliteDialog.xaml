@@ -1,0 +1,105 @@
+<Window x:Class="CarnetSante.WPF.Views.Patient.Modules.IndisponibiliteDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nouvelle Indisponibilité"
+        Width="580" Height="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize">
+    <DockPanel Margin="20">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button Content="Annuler" Click="BtnAnnuler_Click"
+                    Background="#6B7280" Foreground="White"
+                    BorderThickness="0" Padding="15,8" Margin="5,0" Cursor="Hand"/>
+            <Button Content="Enregistrer" Click="BtnEnregistrer_Click"
+                    Background="#1A3A5C" Foreground="White"
+                    BorderThickness="0" Padding="15,8" Cursor="Hand"/>
+        </StackPanel>
+
+        <ScrollViewer DockPanel.Dock="Top">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="Date de début *" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <DatePicker x:Name="DateDebutPicker" Padding="8,6" Margin="0,0,0,10"/>
+                        <TextBlock Text="Durée prescrite (jours) *" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <TextBox x:Name="DureePrescBox" Padding="8,6" BorderBrush="#D1D5DB"
+                                 BorderThickness="1" Margin="0,0,0,10"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Date de fin" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <DatePicker x:Name="DateFinPicker" Padding="8,6" Margin="0,0,0,10"/>
+                        <TextBlock Text="Statut" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <ComboBox x:Name="StatutBox" Padding="8,6" Margin="0,0,0,10">
+                            <ComboBoxItem Content="En cours" Tag="EnCours" IsSelected="True"/>
+                            <ComboBoxItem Content="Terminée" Tag="Terminee"/>
+                            <ComboBoxItem Content="Prolongée" Tag="Prolongee"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="Motif *" FontWeight="SemiBold" Margin="0,4,0,3"/>
+                <TextBox x:Name="MotifBox" Padding="8,6" BorderBrush="#D1D5DB"
+                         BorderThickness="1" Height="65" AcceptsReturn="True" TextWrapping="Wrap"
+                         Margin="0,0,0,10"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="Diagnostic" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <TextBox x:Name="DiagnosticBox" Padding="8,6" BorderBrush="#D1D5DB"
+                                 BorderThickness="1" Margin="0,0,0,10"/>
+                        <TextBlock Text="Code CIM-10" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <TextBox x:Name="CodeCIM10Box" Padding="8,6" BorderBrush="#D1D5DB"
+                                 BorderThickness="1" Margin="0,0,0,10"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Lieu de séjour" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <TextBox x:Name="LieuSejourBox" Padding="8,6" BorderBrush="#D1D5DB"
+                                 BorderThickness="1" Margin="0,0,0,10"/>
+                        <TextBlock Text="Type de séjour" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <ComboBox x:Name="TypeSejourBox" Padding="8,6" Margin="0,0,0,10">
+                            <ComboBoxItem Content="Hospitalisation" IsSelected="True"/>
+                            <ComboBoxItem Content="Domicile"/>
+                            <ComboBoxItem Content="Convalescence"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="État au départ" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <TextBox x:Name="EtatDepartBox" Padding="8,6" BorderBrush="#D1D5DB"
+                                 BorderThickness="1" Height="55" AcceptsReturn="True" TextWrapping="Wrap"
+                                 Margin="0,0,0,10"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="État au retour" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                        <TextBox x:Name="EtatRetourBox" Padding="8,6" BorderBrush="#D1D5DB"
+                                 BorderThickness="1" Height="55" AcceptsReturn="True" TextWrapping="Wrap"
+                                 Margin="0,0,0,10"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="Médecin prescripteur" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <TextBox x:Name="MedecinBox" Padding="8,6" BorderBrush="#D1D5DB"
+                         BorderThickness="1" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Observations" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <TextBox x:Name="ObservationsBox" Padding="8,6" BorderBrush="#D1D5DB"
+                         BorderThickness="1" Height="60" AcceptsReturn="True" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
