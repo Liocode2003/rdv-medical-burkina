@@ -50,7 +50,7 @@ public partial class MainWindow : Window
 
         window.Owner = this;
         window.ShowDialog();
-        _ = _viewModel.ChargerPatientsCommand.Execute(null);
+        _viewModel.ChargerPatientsCommand.Execute(null);
     }
 
     private void OnDemanderDeconnexion()
