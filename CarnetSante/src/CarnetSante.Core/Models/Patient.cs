@@ -1,10 +1,12 @@
-using CarnetSante.Core.Enums;
+using System.Collections.ObjectModel;
 
 namespace CarnetSante.Core.Models;
 
 /// <summary>
 /// Table PATIENTS - Entité centrale du carnet de santé.
 /// Correspond à l'en-tête et l'identifiant unique du carnet.
+/// ObservableCollection utilisé sur toutes les collections pour que les DataGrids WPF
+/// se rafraîchissent immédiatement après ajout via les dialogs.
 /// </summary>
 public class Patient : BaseEntity
 {
@@ -15,28 +17,28 @@ public class Patient : BaseEntity
     public EtatCivil? EtatCivil { get; set; }
 
     // ── MODULE B : CONSTANTES ──────────────────────────────────
-    public ICollection<Constante> Constantes { get; set; } = new List<Constante>();
+    public ObservableCollection<Constante> Constantes { get; set; } = [];
 
     // ── MODULE C : EXAMEN D'INCORPORATION ─────────────────────
     public ExamenIncorporation? ExamenIncorporation { get; set; }
 
     // ── MODULE D : OPÉRATIONS MÉDICALES ───────────────────────
-    public ICollection<OperationMedicale> OperationsMedicales { get; set; } = new List<OperationMedicale>();
+    public ObservableCollection<OperationMedicale> OperationsMedicales { get; set; } = [];
 
     // ── MODULE E : VACCINATIONS ────────────────────────────────
-    public ICollection<Vaccination> Vaccinations { get; set; } = new List<Vaccination>();
+    public ObservableCollection<Vaccination> Vaccinations { get; set; } = [];
 
     // ── MODULE F : VISITES SANITAIRES ─────────────────────────
-    public ICollection<VisiteSanitaire> VisitesSanitaires { get; set; } = new List<VisiteSanitaire>();
+    public ObservableCollection<VisiteSanitaire> VisitesSanitaires { get; set; } = [];
 
     // ── MODULE G : INDISPONIBILITÉS ────────────────────────────
-    public ICollection<Indisponibilite> Indisponibilites { get; set; } = new List<Indisponibilite>();
+    public ObservableCollection<Indisponibilite> Indisponibilites { get; set; } = [];
 
     // ── MODULE H : CERTIFICATS MÉDICAUX ───────────────────────
-    public ICollection<CertificatMedical> CertificatsMedicaux { get; set; } = new List<CertificatMedical>();
+    public ObservableCollection<CertificatMedical> CertificatsMedicaux { get; set; } = [];
 
     // ── MODULE I : DÉCISIONS DE RÉFORME ───────────────────────
-    public ICollection<DecisionReforme> DecisionsReforme { get; set; } = new List<DecisionReforme>();
+    public ObservableCollection<DecisionReforme> DecisionsReforme { get; set; } = [];
 
     // ── MODULE J : CONTRÔLE FIN DE SERVICE ────────────────────
     public ControleFInService? ControleFinService { get; set; }

@@ -1,4 +1,5 @@
 using CarnetSante.Core.Enums;
+using System.Collections.ObjectModel;
 
 namespace CarnetSante.Core.Models;
 
@@ -22,5 +23,5 @@ public class Utilisateur : BaseEntity
     public string? Specialite { get; set; }
 
     // Navigation
-    public ICollection<JournalAudit> JournalAudits { get; set; } = new List<JournalAudit>();
+    public ObservableCollection<JournalAudit> JournalAudits { get; set; } = [];
 }

@@ -1,13 +1,15 @@
-using CarnetSante.Core.Enums;
 using CarnetSante.Core.Models;
 using System.Windows;
 using System.Windows.Controls;
+
+// Alias pour lever l'ambiguïté : le modèle ET l'enum s'appellent tous les deux DecisionReforme
+using DecisionReformeEnum = CarnetSante.Core.Enums.DecisionReforme;
 
 namespace CarnetSante.WPF.Views.Patient.Modules;
 
 public partial class DecisionReformeDialog : Window
 {
-    public DecisionReforme? Decision { get; private set; }
+    public DecisionReforme? Decision { get; private set; }   // modèle CarnetSante.Core.Models
     private readonly int _patientId;
 
     public DecisionReformeDialog(int patientId)
@@ -39,31 +41,31 @@ public partial class DecisionReformeDialog : Window
         }
 
         var decisionTag = (DecisionBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "Maintien";
-        Enums.DecisionReforme decisionEnum = decisionTag switch
+        DecisionReformeEnum decisionEnum = decisionTag switch
         {
-            "RefomeDefinitive"  => Enums.DecisionReforme.RefomeDefinitive,
-            "RefomeTemporaire"  => Enums.DecisionReforme.RefomeTemporaire,
-            "Reengagement"      => Enums.DecisionReforme.Reengagement,
-            "Reclassement"      => Enums.DecisionReforme.Reclassement,
-            _                   => Enums.DecisionReforme.Maintien
+            "RefomeDefinitive"  => DecisionReformeEnum.RefomeDefinitive,
+            "RefomeTemporaire"  => DecisionReformeEnum.RefomeTemporaire,
+            "Reengagement"      => DecisionReformeEnum.Reengagement,
+            "Reclassement"      => DecisionReformeEnum.Reclassement,
+            _                   => DecisionReformeEnum.Maintien
         };
 
         Decision = new DecisionReforme
         {
-            PatientId            = _patientId,
-            DateDecision         = DateDecisionPicker.SelectedDate.Value,
-            NumeroDecision       = NumeroDecisionBox.Text.Trim(),
-            LieuCommission       = LieuCommissionBox.Text.Trim(),
+            PatientId             = _patientId,
+            DateDecision          = DateDecisionPicker.SelectedDate.Value,
+            NumeroDecision        = NumeroDecisionBox.Text.Trim(),
+            LieuCommission        = LieuCommissionBox.Text.Trim(),
             DateReunionCommission = DateReunionPicker.SelectedDate,
             CompositionCommission = CompositionBox.Text.Trim(),
-            Diagnostic           = DiagnosticBox.Text.Trim(),
-            CodeCIM10            = CodeCIM10Box.Text.Trim(),
-            TauxInvalidite       = TauxInvaliditeBox.Text.Trim(),
-            Decision             = decisionEnum,
-            DateEffet            = DateEffetPicker.SelectedDate,
-            PensionAttribuee     = PensionBox.IsChecked == true,
-            TypePension          = TypePensionBox.Text.Trim(),
-            Observations         = ObservationsBox.Text.Trim()
+            Diagnostic            = DiagnosticBox.Text.Trim(),
+            CodeCIM10             = CodeCIM10Box.Text.Trim(),
+            TauxInvalidite        = TauxInvaliditeBox.Text.Trim(),
+            Decision              = decisionEnum,
+            DateEffet             = DateEffetPicker.SelectedDate,
+            PensionAttribuee      = PensionBox.IsChecked == true,
+            TypePension           = TypePensionBox.Text.Trim(),
+            Observations          = ObservationsBox.Text.Trim()
         };
 
         DialogResult = true;

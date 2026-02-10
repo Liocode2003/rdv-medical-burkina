@@ -1,4 +1,5 @@
 using CarnetSante.Core.Enums;
+using System.Collections.ObjectModel;
 
 namespace CarnetSante.Core.Models;
 
@@ -47,7 +48,7 @@ public class EtatCivil : BaseEntity
     public string? Email { get; set; }
 
     // ── Contacts d'urgence ──────────────────────────────────
-    public ICollection<ContactUrgence> ContactsUrgence { get; set; } = new List<ContactUrgence>();
+    public ObservableCollection<ContactUrgence> ContactsUrgence { get; set; } = [];
 
     // ── Empreintes (symbolique) ─────────────────────────────
     public string? EmpreintesNotes { get; set; }
