@@ -19,8 +19,7 @@ public class CarnetSanteDbContextFactory : IDesignTimeDbContextFactory<CarnetSan
 
         // Utilise le répertoire courant du projet Data pour les migrations design-time.
         // Cela évite d'écrire dans le répertoire temporaire système (plus prévisible).
-        var projectDir = Path.GetDirectoryName(
-            typeof(CarnetSanteDbContextFactory).Assembly.Location)!;
+        var projectDir = AppContext.BaseDirectory;
         var dbPath = Path.Combine(projectDir, "carnet_sante_design.db");
 
         optionsBuilder.UseSqlite($"Data Source={dbPath}");

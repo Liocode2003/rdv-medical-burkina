@@ -84,7 +84,7 @@
                 <!-- Menu de navigation -->
                 <StackPanel DockPanel.Dock="Top">
                     <TextBlock Text="NAVIGATION" Foreground="#4A6A8A" FontSize="10"
-                               FontWeight="Bold" Margin="15,0,0,8" LetterSpacing="2"/>
+                               FontWeight="Bold" Margin="15,0,0,8"/>
 
                     <Button Content="📋  Tableau de Bord" Style="{StaticResource MenuButtonStyle}"
                             Command="{Binding ChargerPatientsCommand}"/>
