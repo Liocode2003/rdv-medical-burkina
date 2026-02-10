@@ -50,11 +50,11 @@ public enum StatutIndisponibilite
 }
 
 /// <summary>Type de décision de commission de réforme.</summary>
-public enum DecisionReforme
+public enum TypeDecisionReforme
 {
     Maintien = 1,
-    RefomeDefinitive = 2,
-    RefomeTemporaire = 3,
+    ReformeDefinitive = 2,
+    ReformeTemporaire = 3,
     Reengagement = 4,
     Reclassement = 5
 }

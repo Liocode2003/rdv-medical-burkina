@@ -9,6 +9,8 @@
     <converters:LoadingToTextConverter x:Key="LoadingToTextConverter"/>
     <converters:DateToAgeConverter x:Key="DateToAgeConverter"/>
     <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    <converters:DecisionReformeConverter x:Key="DecisionReformeConverter"/>
+    <converters:AptitudeMedicaleConverter x:Key="AptitudeMedicaleConverter"/>
 
     <!-- Couleurs de l'application -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="#1A3A5C"/>

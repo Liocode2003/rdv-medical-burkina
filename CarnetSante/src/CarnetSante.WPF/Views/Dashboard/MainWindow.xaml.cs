@@ -33,13 +33,12 @@ public partial class MainWindow : Window
 
         window.Owner = this;
         window.ShowDialog();
-        _ = _viewModel.ChargerPatientsCommand.Execute(null);
+        _viewModel.ChargerPatientsCommand.Execute(null); // AsyncRelayCommand.Execute est void
     }
 
     private void OnDemanderDeconnexion()
     {
-        var loginWindow = App.GetLoginWindow();
-        loginWindow.Show();
+        App.AfficherLogin();
         Close();
     }
 

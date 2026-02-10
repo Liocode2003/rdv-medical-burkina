@@ -1,4 +1,5 @@
 using CarnetSante.WPF.ViewModels.Patient;
+using CarnetSante.WPF.Views.Patient.Modules;
 using System.Windows;
 
 namespace CarnetSante.WPF.Views.Patient;
@@ -31,8 +32,7 @@ public partial class PatientWindow : Window
 
     private void BtnAjouterContact_Click(object sender, RoutedEventArgs e)
     {
-        // Dialogue simple pour ajouter un contact d'urgence
-        var dialog = new Modules.ContactUrgenceDialog(ViewModel.Patient?.EtatCivil?.Id ?? 0);
+        var dialog = new ContactUrgenceDialog(ViewModel.Patient?.EtatCivil?.Id ?? 0);
         dialog.Owner = this;
         if (dialog.ShowDialog() == true && dialog.Contact != null)
         {
@@ -44,11 +44,12 @@ public partial class PatientWindow : Window
     private void BtnNouvelleOperation_Click(object sender, RoutedEventArgs e)
     {
         if (ViewModel.Patient == null) return;
-        var dialog = new Modules.OperationDialog(ViewModel.Patient.Id);
+        var dialog = new OperationDialog(ViewModel.Patient.Id);
         dialog.Owner = this;
         if (dialog.ShowDialog() == true && dialog.Operation != null)
         {
-            _ = ViewModel.Patient.OperationsMedicales.Append(dialog.Operation);
+            // .Add() sur la collection ICollection<T> (List<T> en runtime)
+            ViewModel.Patient.OperationsMedicales.Add(dialog.Operation);
             ViewModel.MarquerModifie();
         }
     }

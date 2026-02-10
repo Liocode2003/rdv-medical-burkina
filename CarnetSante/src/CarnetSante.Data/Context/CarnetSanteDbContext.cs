@@ -1,3 +1,4 @@
+using BCrypt.Net;
 using CarnetSante.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -178,6 +179,7 @@ public class CarnetSanteDbContext : DbContext
         {
             e.HasKey(dr => dr.Id);
             e.Property(dr => dr.Diagnostic).IsRequired().HasMaxLength(500);
+            e.Property(dr => dr.Decision).HasConversion<int>();
             e.HasOne(dr => dr.Patient)
              .WithMany(p => p.DecisionsReforme)
              .HasForeignKey(dr => dr.PatientId)
@@ -202,18 +204,32 @@ public class CarnetSanteDbContext : DbContext
              .OnDelete(DeleteBehavior.SetNull);
         });
 
-        // ── SEED : Administrateur par défaut ─────────────────
-        modelBuilder.Entity<Utilisateur>().HasData(new Utilisateur
+        // Note : le seed de l'admin est effectué dans SeedAdminAsync()
+        // appelé depuis App.xaml.cs après la migration, pas dans HasData()
+        // pour permettre le hachage BCrypt au runtime.
+    }
+
+    /// <summary>
+    /// Crée le compte administrateur par défaut si aucun utilisateur n'existe.
+    /// Doit être appelé après MigrateAsync().
+    /// </summary>
+    public async Task SeedAdminAsync()
+    {
+        if (!Utilisateurs.Any())
         {
-            Id = 1,
-            Login = "admin",
-            // Hash BCrypt de "Admin@2024!" - à changer à la première connexion
-            MotDePasseHash = "$2a$11$XqBhJzN5Wz0vNcPFqM9VCuJ8K7LmZrT3eYpA1dR4xGsHbWkO6vI2m",
-            Nom = "Administrateur",
-            Prenom = "Système",
-            Role = CarnetSante.Core.Enums.UserRole.Administrateur,
-            EstActif = true,
-            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-        });
+            var admin = new Utilisateur
+            {
+                Login = "admin",
+                MotDePasseHash = BCrypt.Net.BCrypt.HashPassword("Admin@2024!", workFactor: 11),
+                Nom = "Administrateur",
+                Prenom = "Système",
+                Role = CarnetSante.Core.Enums.UserRole.Administrateur,
+                EstActif = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = "SYSTEM"
+            };
+            await Utilisateurs.AddAsync(admin);
+            await SaveChangesAsync();
+        }
     }
 }

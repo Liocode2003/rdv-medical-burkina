@@ -24,22 +24,17 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // Configuration de l'injection de dépendances
         var services = new ServiceCollection();
         ConfigureServices(services);
         _serviceProvider = services.BuildServiceProvider();
 
-        // Initialisation / migration de la base de données
         await InitialiserBaseDeDonneesAsync();
 
-        // Afficher la fenêtre de connexion
-        var loginWindow = GetLoginWindow();
-        loginWindow.Show();
+        AfficherLogin();
     }
 
     private static void ConfigureServices(ServiceCollection services)
     {
-        // ── Base de données SQLite ───────────────────────────
         string dbPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "CarnetSante",
@@ -47,43 +42,59 @@ public partial class App : Application
 
         Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
-        services.AddDbContext<CarnetSanteDbContext>(options =>
-            options.UseSqlite($"Data Source={dbPath}"));
+        // DbContext en Singleton pour l'application desktop (1 utilisateur, pas de concurrence)
+        services.AddDbContext<CarnetSanteDbContext>(
+            options => options.UseSqlite($"Data Source={dbPath}"),
+            ServiceLifetime.Singleton);
 
-        // ── Repositories ─────────────────────────────────────
-        services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
-        services.AddScoped<IPatientRepository, PatientRepository>();
+        // Repositories et services en Singleton (partagé sur toute la durée de l'application)
+        services.AddSingleton<IUtilisateurRepository, UtilisateurRepository>();
+        services.AddSingleton<IPatientRepository, PatientRepository>();
+        services.AddSingleton<IAuthService, AuthService>();
+        services.AddSingleton<IAuditService, AuditService>();
+        services.AddSingleton<IPatientService, PatientService>();
+        services.AddSingleton<IPdfService, PdfService>();
 
-        // ── Services métier ──────────────────────────────────
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IAuditService, AuditService>();
-        services.AddScoped<IPatientService, PatientService>();
-        services.AddScoped<IPdfService, PdfService>();
-
-        // ── ViewModels ───────────────────────────────────────
+        // ViewModels en Transient (nouvelle instance à chaque fenêtre)
         services.AddTransient<LoginViewModel>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<PatientViewModel>();
 
-        // ── Vues ─────────────────────────────────────────────
-        services.AddTransient<LoginWindow>();
-        services.AddTransient<MainWindow>();
-        services.AddTransient<PatientWindow>();
-
-        // Logging
         services.AddLogging(builder => builder.AddDebug());
     }
 
     private static async Task InitialiserBaseDeDonneesAsync()
     {
-        using var scope = _serviceProvider!.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CarnetSanteDbContext>();
+        var db = _serviceProvider!.GetRequiredService<CarnetSanteDbContext>();
         await db.Database.MigrateAsync();
+        await db.SeedAdminAsync(); // Crée l'admin si premier démarrage
     }
 
     /// <summary>
-    /// Crée et configure la fenêtre de login (point d'entrée après déconnexion aussi).
+    /// Affiche la fenêtre de connexion. Appelé au démarrage et après déconnexion.
     /// </summary>
+    public static void AfficherLogin()
+    {
+        var loginVm = _serviceProvider!.GetRequiredService<LoginViewModel>();
+        var loginWindow = new LoginWindow(loginVm);
+
+        loginVm.ConnexionReussie += () =>
+        {
+            var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
+            var mainWindow = new MainWindow(mainVm, CreerPatientWindow);
+            mainWindow.Show();
+        };
+
+        loginWindow.Show();
+    }
+
+    private static PatientWindow CreerPatientWindow()
+    {
+        var vm = _serviceProvider!.GetRequiredService<PatientViewModel>();
+        return new PatientWindow(vm);
+    }
+
+    // Méthode conservée pour compatibilité avec MainWindow.xaml.cs
     public static LoginWindow GetLoginWindow()
     {
         var loginVm = _serviceProvider!.GetRequiredService<LoginViewModel>();
@@ -92,10 +103,8 @@ public partial class App : Application
         loginVm.ConnexionReussie += () =>
         {
             var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
-            var mainWindow = new MainWindow(mainVm,
-                () => _serviceProvider!.GetRequiredService<PatientWindow>());
+            var mainWindow = new MainWindow(mainVm, CreerPatientWindow);
             mainWindow.Show();
-            loginWindow.Close();
         };
 
         return loginWindow;

@@ -148,16 +148,17 @@
 
                                 <TextBlock Text="Groupe Sanguin" Style="{StaticResource FieldLabelStyle}"/>
                                 <ComboBox SelectedValue="{Binding Patient.EtatCivil.GroupeSanguin}"
+                                          SelectedValuePath="Tag"
                                           Padding="8,6" IsEnabled="{Binding EstMedecin}">
-                                    <ComboBoxItem Content="A+"/>
-                                    <ComboBoxItem Content="A-"/>
-                                    <ComboBoxItem Content="B+"/>
-                                    <ComboBoxItem Content="B-"/>
-                                    <ComboBoxItem Content="AB+"/>
-                                    <ComboBoxItem Content="AB-"/>
-                                    <ComboBoxItem Content="O+"/>
-                                    <ComboBoxItem Content="O-"/>
-                                    <ComboBoxItem Content="Inconnu"/>
+                                    <ComboBoxItem Content="A+" Tag="1"/>
+                                    <ComboBoxItem Content="A-" Tag="2"/>
+                                    <ComboBoxItem Content="B+" Tag="3"/>
+                                    <ComboBoxItem Content="B-" Tag="4"/>
+                                    <ComboBoxItem Content="AB+" Tag="5"/>
+                                    <ComboBoxItem Content="AB-" Tag="6"/>
+                                    <ComboBoxItem Content="O+" Tag="7"/>
+                                    <ComboBoxItem Content="O-" Tag="8"/>
+                                    <ComboBoxItem Content="Inconnu" Tag="9"/>
                                 </ComboBox>
                             </StackPanel>
 
@@ -634,7 +635,8 @@
                             <DataGridTextColumn Header="Date" Width="90"
                                                 Binding="{Binding DateDecision, StringFormat='dd/MM/yyyy'}"/>
                             <DataGridTextColumn Header="Diagnostic" Width="*" Binding="{Binding Diagnostic}"/>
-                            <DataGridTextColumn Header="Décision" Width="150" Binding="{Binding Decision}"/>
+                            <DataGridTextColumn Header="Décision" Width="150"
+                                                Binding="{Binding Decision, Converter={StaticResource DecisionReformeConverter}}"/>
                             <DataGridTextColumn Header="Taux invalidité" Width="100"
                                                 Binding="{Binding TauxInvalidite}"/>
                         </DataGrid.Columns>
@@ -661,10 +663,13 @@
                                 <DatePicker SelectedDate="{Binding Patient.ControleFinService.DateControle}"
                                             Padding="8,6" IsEnabled="{Binding EstMedecin}"/>
                                 <TextBlock Text="Aptitude à rejoindre le foyer" Style="{StaticResource FieldLabelStyle}"/>
-                                <ComboBox Padding="8,6" IsEnabled="{Binding EstMedecin}">
-                                    <ComboBoxItem Content="Apte"/>
-                                    <ComboBoxItem Content="Inapte"/>
-                                    <ComboBoxItem Content="Apte avec réserves"/>
+                                <ComboBox SelectedValue="{Binding Patient.ControleFinService.AptitudeRejoindreForyer}"
+                                          SelectedValuePath="Tag"
+                                          Padding="8,6" IsEnabled="{Binding EstMedecin}">
+                                    <ComboBoxItem Content="Apte" Tag="1"/>
+                                    <ComboBoxItem Content="Inapte" Tag="2"/>
+                                    <ComboBoxItem Content="À surveiller" Tag="3"/>
+                                    <ComboBoxItem Content="Apte limité" Tag="4"/>
                                 </ComboBox>
                                 <TextBlock Text="Date fin de service" Style="{StaticResource FieldLabelStyle}"/>
                                 <DatePicker SelectedDate="{Binding Patient.ControleFinService.DateFinService}"

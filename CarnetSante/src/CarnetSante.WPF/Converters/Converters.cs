@@ -1,3 +1,4 @@
+using CarnetSante.Core.Enums;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -88,4 +89,53 @@ public class InverseBoolConverter : IValueConverter
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => value is bool b && !b;
+}
+
+/// <summary>
+/// Traduit un enum TypeDecisionReforme en libellé lisible.
+/// </summary>
+[ValueConversion(typeof(TypeDecisionReforme), typeof(string))]
+public class DecisionReformeConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is TypeDecisionReforme d)
+            return d switch
+            {
+                TypeDecisionReforme.Maintien          => "Maintien en service",
+                TypeDecisionReforme.ReformeDefinitive => "Réforme définitive",
+                TypeDecisionReforme.ReformeTemporaire => "Réforme temporaire",
+                TypeDecisionReforme.Reengagement      => "Réengagement",
+                TypeDecisionReforme.Reclassement      => "Reclassement",
+                _                                     => d.ToString()
+            };
+        return value?.ToString() ?? "-";
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+/// <summary>
+/// Traduit l'enum AptitudeMedicale en libellé lisible.
+/// </summary>
+[ValueConversion(typeof(AptitudeMedicale), typeof(string))]
+public class AptitudeMedicaleConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is AptitudeMedicale a)
+            return a switch
+            {
+                AptitudeMedicale.Apte        => "Apte",
+                AptitudeMedicale.Inapte      => "Inapte",
+                AptitudeMedicale.ASurveiller => "À surveiller",
+                AptitudeMedicale.ApteLimite  => "Apte limité",
+                _                            => a.ToString()
+            };
+        return value?.ToString() ?? "-";
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 }

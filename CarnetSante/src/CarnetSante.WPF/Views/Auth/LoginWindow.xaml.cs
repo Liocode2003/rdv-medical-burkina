@@ -25,7 +25,17 @@ public partial class LoginWindow : Window
 
     private void OnConnexionReussie()
     {
-        DialogResult = true;
+        // DialogResult ne peut être défini que si la fenêtre a été ouverte avec ShowDialog()
+        if (IsModal()) DialogResult = true;
         Close();
+    }
+
+    private bool IsModal()
+    {
+        // Vérifie si la fenêtre a été ouverte modalement
+        return (bool)typeof(Window)
+            .GetField("_showingAsDialog",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .GetValue(this)!;
     }
 }
