@@ -1,6 +1,8 @@
 using CarnetSante.Core.Models;
 using CarnetSante.Core.Services;
 using System.Collections.ObjectModel;
+using System.IO;
+using Patient = CarnetSante.Core.Models.Patient;
 
 namespace CarnetSante.WPF.ViewModels.Dashboard;
 
