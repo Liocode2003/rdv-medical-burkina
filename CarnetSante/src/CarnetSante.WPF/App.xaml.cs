@@ -9,6 +9,7 @@ using CarnetSante.WPF.Views.Auth;
 using CarnetSante.WPF.Views.Dashboard;
 using CarnetSante.WPF.Views.Patient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.IO;
@@ -19,27 +20,45 @@ namespace CarnetSante.WPF;
 public partial class App : Application
 {
     private static IServiceProvider? _serviceProvider;
+    private static IConfiguration? _configuration;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
-        // Configuration de l'injection de dépendances
+        _configuration = ChargerConfiguration();
+
         var services = new ServiceCollection();
         ConfigureServices(services);
         _serviceProvider = services.BuildServiceProvider();
 
-        // Initialisation / migration de la base de données
         await InitialiserBaseDeDonneesAsync();
 
-        // Afficher la fenêtre de connexion
         var loginWindow = GetLoginWindow();
         loginWindow.Show();
     }
 
+    /// <summary>
+    /// Charge la configuration depuis appsettings.json et appsettings.Production.json (optionnel).
+    /// Le mot de passe de chiffrement peut aussi être fourni via la variable d'environnement
+    /// CARNETSANTE_DB_PASSWORD.
+    /// </summary>
+    private static IConfiguration ChargerConfiguration()
+    {
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: false)
+            .AddEnvironmentVariables(prefix: "CARNETSANTE_");
+
+        return builder.Build();
+    }
+
     private static void ConfigureServices(ServiceCollection services)
     {
-        // ── Base de données SQLite ───────────────────────────
+        services.AddSingleton(_configuration!);
+
+        // ── Base de données SQLite (avec chiffrement optionnel) ──────────
         string dbPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "CarnetSante",
@@ -47,8 +66,30 @@ public partial class App : Application
 
         Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
+        bool chiffrementActif = _configuration!.GetValue<bool>("Database:ChiffrementActif");
+        string motDePasse = ObtenirMotDePasseBdd();
+
         services.AddDbContext<CarnetSanteDbContext>(options =>
-            options.UseSqlite($"Data Source={dbPath}"));
+        {
+            if (chiffrementActif && !string.IsNullOrWhiteSpace(motDePasse))
+            {
+                // Connexion SQLCipher avec mot de passe (chiffrement AES-256)
+                options.UseSqlite($"Data Source={dbPath};Password={motDePasse}");
+            }
+            else if (chiffrementActif && string.IsNullOrWhiteSpace(motDePasse))
+            {
+                // Chiffrement demandé mais pas de mot de passe configuré : erreur fatale
+                throw new InvalidOperationException(
+                    "Le chiffrement de la base de données est activé mais aucun mot de passe " +
+                    "n'est configuré. Définissez 'Database:MotDePasseChiffrement' dans " +
+                    "appsettings.Production.json ou la variable d'environnement " +
+                    "CARNETSANTE_Database__MotDePasseChiffrement.");
+            }
+            else
+            {
+                options.UseSqlite($"Data Source={dbPath}");
+            }
+        });
 
         // ── Repositories ─────────────────────────────────────
         services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
@@ -70,8 +111,18 @@ public partial class App : Application
         services.AddTransient<MainWindow>();
         services.AddTransient<PatientWindow>();
 
-        // Logging
         services.AddLogging(builder => builder.AddDebug());
+    }
+
+    /// <summary>
+    /// Résout le mot de passe de chiffrement par ordre de priorité :
+    /// 1. Variable d'environnement CARNETSANTE_Database__MotDePasseChiffrement
+    /// 2. appsettings.Production.json → Database:MotDePasseChiffrement
+    /// 3. appsettings.json → Database:MotDePasseChiffrement (vide par défaut)
+    /// </summary>
+    private static string ObtenirMotDePasseBdd()
+    {
+        return _configuration!.GetValue<string>("Database:MotDePasseChiffrement") ?? string.Empty;
     }
 
     private static async Task InitialiserBaseDeDonneesAsync()
@@ -81,9 +132,6 @@ public partial class App : Application
         await db.Database.MigrateAsync();
     }
 
-    /// <summary>
-    /// Crée et configure la fenêtre de login (point d'entrée après déconnexion aussi).
-    /// </summary>
     public static LoginWindow GetLoginWindow()
     {
         var loginVm = _serviceProvider!.GetRequiredService<LoginViewModel>();
