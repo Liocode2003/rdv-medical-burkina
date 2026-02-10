@@ -1,0 +1,30 @@
+{
+  "_instructions": [
+    "1. Copiez ce fichier en 'appsettings.Production.json' (sans .template)",
+    "2. Remplacez TOUTES les valeurs entre <...> par vos valeurs réelles",
+    "3. Ne commitez JAMAIS appsettings.Production.json dans le dépôt git",
+    "4. Conservez ce fichier en lieu sûr (gestionnaire de secrets ou coffre-fort)"
+  ],
+  "Database": {
+    "ChiffrementActif": true,
+    "MotDePasseChiffrement": "<MOT_DE_PASSE_FORT_AU_MOINS_32_CARACTERES>",
+    "SauvegardeAutomatique": true,
+    "IntervalSauvegardeHeures": 12
+  },
+  "Securite": {
+    "MaxTentativesConnexion": 5,
+    "DureeBloquageMinutes": 30,
+    "DureeSessionHeures": 8,
+    "NecessiteChangementMdpInitial": true
+  },
+  "PDF": {
+    "DossierExport": "%USERPROFILE%\\Documents\\CarnetSante\\Exports",
+    "LogoPath": "Resources/Icons/logo.png"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Microsoft": "Error"
+    }
+  }
+}
