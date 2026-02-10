@@ -141,23 +141,23 @@
                                 <ComboBox SelectedValue="{Binding Patient.EtatCivil.Sexe}"
                                           SelectedValuePath="Tag" Padding="8,6" FontSize="13"
                                           IsEnabled="{Binding EstMedecin}">
-                                    <ComboBoxItem Content="Masculin" Tag="1"/>
-                                    <ComboBoxItem Content="Féminin" Tag="2"/>
-                                    <ComboBoxItem Content="Autre" Tag="3"/>
+                                    <ComboBoxItem Content="Masculin" Tag="Masculin"/>
+                                    <ComboBoxItem Content="Féminin" Tag="Feminin"/>
+                                    <ComboBoxItem Content="Autre" Tag="Autre"/>
                                 </ComboBox>
 
                                 <TextBlock Text="Groupe Sanguin" Style="{StaticResource FieldLabelStyle}"/>
                                 <ComboBox SelectedValue="{Binding Patient.EtatCivil.GroupeSanguin}"
-                                          Padding="8,6" IsEnabled="{Binding EstMedecin}">
-                                    <ComboBoxItem Content="A+"/>
-                                    <ComboBoxItem Content="A-"/>
-                                    <ComboBoxItem Content="B+"/>
-                                    <ComboBoxItem Content="B-"/>
-                                    <ComboBoxItem Content="AB+"/>
-                                    <ComboBoxItem Content="AB-"/>
-                                    <ComboBoxItem Content="O+"/>
-                                    <ComboBoxItem Content="O-"/>
-                                    <ComboBoxItem Content="Inconnu"/>
+                                          SelectedValuePath="Tag" Padding="8,6" IsEnabled="{Binding EstMedecin}">
+                                    <ComboBoxItem Content="A+" Tag="APositif"/>
+                                    <ComboBoxItem Content="A-" Tag="ANegatif"/>
+                                    <ComboBoxItem Content="B+" Tag="BPositif"/>
+                                    <ComboBoxItem Content="B-" Tag="BNegatif"/>
+                                    <ComboBoxItem Content="AB+" Tag="ABPositif"/>
+                                    <ComboBoxItem Content="AB-" Tag="ABNegatif"/>
+                                    <ComboBoxItem Content="O+" Tag="OPositif"/>
+                                    <ComboBoxItem Content="O-" Tag="ONegatif"/>
+                                    <ComboBoxItem Content="Inconnu" Tag="Inconnu"/>
                                 </ComboBox>
                             </StackPanel>
 
@@ -661,10 +661,12 @@
                                 <DatePicker SelectedDate="{Binding Patient.ControleFinService.DateControle}"
                                             Padding="8,6" IsEnabled="{Binding EstMedecin}"/>
                                 <TextBlock Text="Aptitude à rejoindre le foyer" Style="{StaticResource FieldLabelStyle}"/>
-                                <ComboBox Padding="8,6" IsEnabled="{Binding EstMedecin}">
-                                    <ComboBoxItem Content="Apte"/>
-                                    <ComboBoxItem Content="Inapte"/>
-                                    <ComboBoxItem Content="Apte avec réserves"/>
+                                <ComboBox SelectedValue="{Binding Patient.ControleFinService.AptitudeRejoindreForyer}"
+                                          SelectedValuePath="Tag" Padding="8,6" IsEnabled="{Binding EstMedecin}">
+                                    <ComboBoxItem Content="Apte" Tag="Apte"/>
+                                    <ComboBoxItem Content="Inapte" Tag="Inapte"/>
+                                    <ComboBoxItem Content="À surveiller" Tag="ASurveiller"/>
+                                    <ComboBoxItem Content="Apte limité" Tag="ApteLimite"/>
                                 </ComboBox>
                                 <TextBlock Text="Date fin de service" Style="{StaticResource FieldLabelStyle}"/>
                                 <DatePicker SelectedDate="{Binding Patient.ControleFinService.DateFinService}"

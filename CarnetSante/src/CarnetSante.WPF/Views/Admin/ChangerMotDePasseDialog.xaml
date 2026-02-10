@@ -1,0 +1,85 @@
+<Window x:Class="CarnetSante.WPF.Views.Admin.ChangerMotDePasseDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Changer mon mot de passe"
+        Width="420" Height="380"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F0F4F8">
+
+    <DockPanel Margin="25">
+        <!-- Boutons -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button Content="Annuler" Click="BtnAnnuler_Click"
+                    Background="#6B7280" Foreground="White"
+                    BorderThickness="0" Padding="15,8" Margin="0,0,8,0" Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="5"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="Changer le mot de passe" Click="BtnChanger_Click"
+                    Background="#1A3A5C" Foreground="White"
+                    BorderThickness="0" Padding="15,8" Cursor="Hand" FontWeight="Bold">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="5"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2D5A8E"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Top">
+            <TextBlock Text="Changer mon mot de passe" FontSize="16" FontWeight="Bold"
+                       Foreground="#1A3A5C" Margin="0,0,0,20"/>
+
+            <TextBlock Text="Mot de passe actuel *" FontWeight="SemiBold" Margin="0,0,0,3"/>
+            <PasswordBox x:Name="AncienMdpBox" Padding="8,6" BorderBrush="#D1D5DB"
+                         BorderThickness="1" Margin="0,0,0,12"/>
+
+            <TextBlock Text="Nouveau mot de passe *" FontWeight="SemiBold" Margin="0,0,0,3"/>
+            <PasswordBox x:Name="NouveauMdpBox" Padding="8,6" BorderBrush="#D1D5DB"
+                         BorderThickness="1" Margin="0,0,0,6"/>
+            <TextBlock Text="(minimum 8 caractères)" FontSize="11" Foreground="#6B7280" Margin="0,0,0,12"/>
+
+            <TextBlock Text="Confirmer le nouveau mot de passe *" FontWeight="SemiBold" Margin="0,0,0,3"/>
+            <PasswordBox x:Name="ConfirmMdpBox" Padding="8,6" BorderBrush="#D1D5DB"
+                         BorderThickness="1" Margin="0,0,0,12"/>
+
+            <Border x:Name="ErrorBorder" Background="#FEE2E2" CornerRadius="5" Padding="10,8"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="ErrorText" Foreground="#DC2626" FontSize="12" TextWrapping="Wrap"/>
+            </Border>
+
+            <Border x:Name="SuccessBorder" Background="#DCFCE7" CornerRadius="5" Padding="10,8"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="SuccessText" Foreground="#166534" FontSize="12" TextWrapping="Wrap"/>
+            </Border>
+        </StackPanel>
+    </DockPanel>
+</Window>

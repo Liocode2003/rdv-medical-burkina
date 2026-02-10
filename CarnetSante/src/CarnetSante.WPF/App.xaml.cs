@@ -2,9 +2,11 @@ using CarnetSante.Core.Services;
 using CarnetSante.Data.Context;
 using CarnetSante.Data.Repositories;
 using CarnetSante.WPF.Services;
+using CarnetSante.WPF.ViewModels.Admin;
 using CarnetSante.WPF.ViewModels.Auth;
 using CarnetSante.WPF.ViewModels.Dashboard;
 using CarnetSante.WPF.ViewModels.Patient;
+using CarnetSante.WPF.Views.Admin;
 using CarnetSante.WPF.Views.Auth;
 using CarnetSante.WPF.Views.Dashboard;
 using CarnetSante.WPF.Views.Patient;
@@ -105,11 +107,15 @@ public partial class App : Application
         services.AddTransient<LoginViewModel>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<PatientViewModel>();
+        services.AddTransient<GestionUtilisateursViewModel>();
+        services.AddTransient<JournalAuditViewModel>();
 
         // ── Vues ─────────────────────────────────────────────
         services.AddTransient<LoginWindow>();
         services.AddTransient<MainWindow>();
         services.AddTransient<PatientWindow>();
+        services.AddTransient<GestionUtilisateursWindow>();
+        services.AddTransient<JournalAuditWindow>();
 
         services.AddLogging(builder => builder.AddDebug());
     }
@@ -128,20 +134,54 @@ public partial class App : Application
     private static async Task InitialiserBaseDeDonneesAsync()
     {
         using var scope = _serviceProvider!.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CarnetSanteDbContext>();
+        var db          = scope.ServiceProvider.GetRequiredService<CarnetSanteDbContext>();
+        var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
+
         await db.Database.MigrateAsync();
+
+        // Vérifier que l'admin par défaut a un hash BCrypt valide.
+        // La migration seed peut contenir un hash généré en dehors de l'appli ;
+        // on le régénère à la première exécution si la vérification échoue.
+        var admin = await db.Utilisateurs.FirstOrDefaultAsync(u => u.Login == "admin");
+        if (admin != null && !authService.VerifierMotDePasse("Admin@2024!", admin.MotDePasseHash))
+        {
+            admin.MotDePasseHash = authService.HacherMotDePasse("Admin@2024!");
+            await db.SaveChangesAsync();
+        }
+        else if (admin == null)
+        {
+            // Aucun admin trouvé (base vierge ou seed manqué) : on en crée un
+            db.Utilisateurs.Add(new Core.Models.Utilisateur
+            {
+                Login          = "admin",
+                MotDePasseHash = authService.HacherMotDePasse("Admin@2024!"),
+                Nom            = "Administrateur",
+                Prenom         = "Système",
+                Role           = Core.Enums.UserRole.Administrateur,
+                EstActif       = true,
+                CreatedAt      = DateTime.UtcNow
+            });
+            await db.SaveChangesAsync();
+        }
     }
 
     public static LoginWindow GetLoginWindow()
     {
-        var loginVm = _serviceProvider!.GetRequiredService<LoginViewModel>();
+        var loginVm     = _serviceProvider!.GetRequiredService<LoginViewModel>();
         var loginWindow = new LoginWindow(loginVm);
 
         loginVm.ConnexionReussie += () =>
         {
-            var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
-            var mainWindow = new MainWindow(mainVm,
-                () => _serviceProvider!.GetRequiredService<PatientWindow>());
+            var mainVm     = _serviceProvider!.GetRequiredService<MainViewModel>();
+            var authService = _serviceProvider!.GetRequiredService<IAuthService>();
+
+            var mainWindow = new MainWindow(
+                mainVm,
+                () => _serviceProvider!.GetRequiredService<PatientWindow>(),
+                () => _serviceProvider!.GetRequiredService<GestionUtilisateursWindow>(),
+                () => _serviceProvider!.GetRequiredService<JournalAuditWindow>(),
+                authService);
+
             mainWindow.Show();
             loginWindow.Close();
         };

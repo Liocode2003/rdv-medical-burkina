@@ -22,10 +22,14 @@ public class MainViewModel : BaseViewModel
         _authService = authService;
         _auditService = auditService;
 
-        ChargerPatientsCommand = new AsyncRelayCommand(ChargerPatientsAsync);
-        RechercherCommand = new AsyncRelayCommand(RechercherAsync);
-        NouveauPatientCommand = new RelayCommand(NouveauPatient);
-        DeconnecterCommand = new AsyncRelayCommand(DeconnecterAsync);
+        ChargerPatientsCommand     = new AsyncRelayCommand(ChargerPatientsAsync);
+        RechercherCommand          = new AsyncRelayCommand(RechercherAsync);
+        NouveauPatientCommand      = new RelayCommand(NouveauPatient);
+        DeconnecterCommand         = new AsyncRelayCommand(DeconnecterAsync);
+        OuvrirUtilisateursCommand  = new RelayCommand(() => DemanderOuvrirUtilisateurs?.Invoke(), () => EstAdmin);
+        OuvrirJournalAuditCommand  = new RelayCommand(() => DemanderOuvrirJournalAudit?.Invoke(), () => EstAdmin);
+        OuvrirChangerMdpCommand    = new RelayCommand(() => DemanderChangerMdp?.Invoke());
+        SauvegarderBDDCommand      = new AsyncRelayCommand(SauvegarderBDDAsync, () => EstAdmin);
 
         _ = ChargerPatientsAsync();
     }
@@ -73,14 +77,21 @@ public class MainViewModel : BaseViewModel
         Core.Enums.UserRole.Administrateur, Core.Enums.UserRole.Medecin);
 
     // ── Commandes ────────────────────────────────────────────
-    public AsyncRelayCommand ChargerPatientsCommand { get; }
-    public AsyncRelayCommand RechercherCommand { get; }
-    public RelayCommand NouveauPatientCommand { get; }
-    public AsyncRelayCommand DeconnecterCommand { get; }
+    public AsyncRelayCommand ChargerPatientsCommand    { get; }
+    public AsyncRelayCommand RechercherCommand         { get; }
+    public RelayCommand      NouveauPatientCommand     { get; }
+    public AsyncRelayCommand DeconnecterCommand        { get; }
+    public RelayCommand      OuvrirUtilisateursCommand { get; }
+    public RelayCommand      OuvrirJournalAuditCommand { get; }
+    public RelayCommand      OuvrirChangerMdpCommand   { get; }
+    public AsyncRelayCommand SauvegarderBDDCommand     { get; }
 
     // Événements de navigation
     public event Action<Patient?>? OuvrirFichePatient;
     public event Action? DemanderDeconnexion;
+    public event Action? DemanderOuvrirUtilisateurs;
+    public event Action? DemanderOuvrirJournalAudit;
+    public event Action? DemanderChangerMdp;
 
     // ── Actions ──────────────────────────────────────────────
     private async Task ChargerPatientsAsync()
@@ -125,6 +136,38 @@ public class MainViewModel : BaseViewModel
         await _auditService.EnregistrerAsync(Core.Enums.TypeAction.Deconnexion, "Déconnexion utilisateur");
         await _authService.DeconnecterAsync();
         DemanderDeconnexion?.Invoke();
+    }
+
+    private async Task SauvegarderBDDAsync()
+    {
+        IsLoading = true;
+        ClearMessages();
+        try
+        {
+            // Sauvegarde la base SQLite vers un fichier horodaté
+            string srcPath = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "CarnetSante", "carnet_sante.db");
+
+            string backupDir = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "CarnetSante", "Backups");
+
+            System.IO.Directory.CreateDirectory(backupDir);
+
+            string backupFile = System.IO.Path.Combine(backupDir,
+                $"carnet_sante_{DateTime.Now:yyyyMMdd_HHmmss}.db");
+
+            await Task.Run(() => System.IO.File.Copy(srcPath, backupFile, overwrite: false));
+
+            await _auditService.EnregistrerAsync(
+                Core.Enums.TypeAction.Sauvegarde,
+                $"Sauvegarde manuelle : {backupFile}");
+
+            SuccessMessage = $"Sauvegarde créée : {System.IO.Path.GetFileName(backupFile)}";
+        }
+        catch (Exception ex) { ErrorMessage = $"Erreur sauvegarde : {ex.Message}"; }
+        finally { IsLoading = false; }
     }
 
     public void OuvrirPatient(Patient patient) => OuvrirFichePatient?.Invoke(patient);

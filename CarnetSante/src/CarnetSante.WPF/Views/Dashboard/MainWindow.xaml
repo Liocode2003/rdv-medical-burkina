@@ -98,11 +98,20 @@
                     <TextBlock Text="ADMINISTRATION" Foreground="#4A6A8A" FontSize="10"
                                FontWeight="Bold" Margin="15,0,0,8"/>
                     <Button Content="📊  Journal d'Audit" Style="{StaticResource MenuButtonStyle}"
+                            Command="{Binding OuvrirJournalAuditCommand}"
                             Visibility="{Binding EstAdmin, Converter={StaticResource BoolToVisConverter}}"/>
-                    <Button Content="💾  Sauvegarde" Style="{StaticResource MenuButtonStyle}"
+                    <Button Content="💾  Sauvegarde BDD" Style="{StaticResource MenuButtonStyle}"
+                            Command="{Binding SauvegarderBDDCommand}"
                             Visibility="{Binding EstAdmin, Converter={StaticResource BoolToVisConverter}}"/>
                     <Button Content="👤  Utilisateurs" Style="{StaticResource MenuButtonStyle}"
+                            Command="{Binding OuvrirUtilisateursCommand}"
                             Visibility="{Binding EstAdmin, Converter={StaticResource BoolToVisConverter}}"/>
+
+                    <Separator Background="#2D4A6C" Margin="15,10"/>
+                    <TextBlock Text="MON COMPTE" Foreground="#4A6A8A" FontSize="10"
+                               FontWeight="Bold" Margin="15,0,0,8"/>
+                    <Button Content="🔑  Changer Mot de Passe" Style="{StaticResource MenuButtonStyle}"
+                            Command="{Binding OuvrirChangerMdpCommand}"/>
                 </StackPanel>
 
                 <!-- Déconnexion en bas -->
@@ -153,6 +162,18 @@
                                 BorderThickness="0" Padding="15,8" Margin="8,0,0,0" Cursor="Hand"/>
                     </Grid>
                 </Grid>
+            </Border>
+
+            <!-- Messages globaux (succès / erreur) -->
+            <Border DockPanel.Dock="Top" Background="#DCFCE7" Padding="12,8" Margin="20,10,20,0"
+                    CornerRadius="6"
+                    Visibility="{Binding SuccessMessage, Converter={StaticResource NullToVisibilityConverter}}">
+                <TextBlock Text="{Binding SuccessMessage}" Foreground="#166534" FontSize="13"/>
+            </Border>
+            <Border DockPanel.Dock="Top" Background="#FEE2E2" Padding="12,8" Margin="20,10,20,0"
+                    CornerRadius="6"
+                    Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibilityConverter}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13"/>
             </Border>
 
             <!-- Zone principale -->
