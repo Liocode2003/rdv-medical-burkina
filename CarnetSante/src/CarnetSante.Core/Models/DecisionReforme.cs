@@ -26,7 +26,7 @@ public class DecisionReforme : BaseEntity
     public string? TauxInvalidite { get; set; }     // Ex: 25%, 40%...
 
     // ── Décision ─────────────────────────────────────────────
-    public DecisionReforme Decision { get; set; }
+    public TypeDecisionReforme Decision { get; set; }
     public string? MotifDecision { get; set; }
     public string? ConditionsReengagement { get; set; }
     public bool PensionAttribuee { get; set; } = false;

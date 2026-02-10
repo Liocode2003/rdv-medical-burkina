@@ -178,6 +178,7 @@ public class CarnetSanteDbContext : DbContext
         {
             e.HasKey(dr => dr.Id);
             e.Property(dr => dr.Diagnostic).IsRequired().HasMaxLength(500);
+            e.Property(dr => dr.Decision).HasConversion<int>();
             e.HasOne(dr => dr.Patient)
              .WithMany(p => p.DecisionsReforme)
              .HasForeignKey(dr => dr.PatientId)
