@@ -1,0 +1,49 @@
+<Window x:Class="CarnetSante.WPF.Views.Patient.Modules.ContactUrgenceDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ajouter un Contact d'Urgence"
+        Width="420" Height="380"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <DockPanel Margin="20">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button Content="Annuler" Click="BtnAnnuler_Click"
+                    Background="#6B7280" Foreground="White"
+                    BorderThickness="0" Padding="15,8" Margin="5,0" Cursor="Hand"/>
+            <Button Content="Ajouter" Click="BtnAjouter_Click"
+                    Background="#1A3A5C" Foreground="White"
+                    BorderThickness="0" Padding="15,8" Cursor="Hand"/>
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Top">
+            <TextBlock Text="Nom complet *" FontWeight="SemiBold" Margin="0,0,0,3"/>
+            <TextBox x:Name="NomCompletBox" Padding="8,6" BorderBrush="#D1D5DB"
+                     BorderThickness="1" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Lien de parenté" FontWeight="SemiBold" Margin="0,0,0,3"/>
+            <ComboBox x:Name="LienParenteBox" Padding="8,6" Margin="0,0,0,10" IsEditable="True">
+                <ComboBoxItem Content="Père"/>
+                <ComboBoxItem Content="Mère"/>
+                <ComboBoxItem Content="Conjoint(e)"/>
+                <ComboBoxItem Content="Frère"/>
+                <ComboBoxItem Content="Sœur"/>
+                <ComboBoxItem Content="Enfant"/>
+                <ComboBoxItem Content="Ami(e)"/>
+                <ComboBoxItem Content="Autre"/>
+            </ComboBox>
+
+            <TextBlock Text="Téléphone *" FontWeight="SemiBold" Margin="0,0,0,3"/>
+            <TextBox x:Name="TelephoneBox" Padding="8,6" BorderBrush="#D1D5DB"
+                     BorderThickness="1" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Téléphone alternatif" FontWeight="SemiBold" Margin="0,0,0,3"/>
+            <TextBox x:Name="TelephoneAltBox" Padding="8,6" BorderBrush="#D1D5DB"
+                     BorderThickness="1" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Adresse" FontWeight="SemiBold" Margin="0,0,0,3"/>
+            <TextBox x:Name="AdresseBox" Padding="8,6" BorderBrush="#D1D5DB"
+                     BorderThickness="1" Height="60" AcceptsReturn="True" TextWrapping="Wrap"/>
+        </StackPanel>
+    </DockPanel>
+</Window>

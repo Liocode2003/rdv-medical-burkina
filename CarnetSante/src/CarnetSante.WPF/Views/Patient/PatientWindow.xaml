@@ -1,0 +1,724 @@
+<Window x:Class="CarnetSante.WPF.Views.Patient.PatientWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="{Binding TitrePatient}"
+        Width="1100" Height="750"
+        WindowStartupLocation="CenterOwner"
+        Background="#F0F4F8">
+
+    <Window.Resources>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Margin" Value="0,8,0,3"/>
+        </Style>
+
+        <Style x:Key="FieldBoxStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#1A3A5C"/>
+                </Trigger>
+                <Trigger Property="IsReadOnly" Value="True">
+                    <Setter Property="Background" Value="#F9FAFB"/>
+                    <Setter Property="Foreground" Value="#6B7280"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#1A3A5C"/>
+            <Setter Property="Margin" Value="0,15,0,10"/>
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="4,0"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Barre d'actions supérieure -->
+        <Border DockPanel.Dock="Top" Background="White" Padding="15,10">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="5" ShadowDepth="1" Opacity="0.1" Direction="270"/>
+            </Border.Effect>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="📋" FontSize="20" Margin="0,0,10,0"/>
+                    <StackPanel>
+                        <TextBlock Text="{Binding TitrePatient}" FontSize="16"
+                                   FontWeight="Bold" Foreground="#1A3A5C"/>
+                        <TextBlock Text="{Binding Patient.NumeroCarnet, StringFormat='Carnet n° {0}'}"
+                                   FontSize="11" Foreground="#6B7280"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <!-- Messages -->
+                    <TextBlock Text="{Binding SuccessMessage}" Foreground="#16A34A"
+                               FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0"
+                               Visibility="{Binding SuccessMessage,
+                                            Converter={StaticResource NullToVisibilityConverter}}"/>
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626"
+                               FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0"
+                               Visibility="{Binding ErrorMessage,
+                                            Converter={StaticResource NullToVisibilityConverter}}"/>
+
+                    <Button Content="💾 Enregistrer" Style="{StaticResource ActionButtonStyle}"
+                            Command="{Binding SauvegarderCommand}"
+                            Background="#16A34A" Foreground="White"/>
+                    <Button Content="🖨️ Imprimer Carnet" Style="{StaticResource ActionButtonStyle}"
+                            Command="{Binding ImprimerCarnetCommand}"
+                            Background="#1A3A5C" Foreground="White"/>
+                    <Button Content="Imprimer Section" Style="{StaticResource ActionButtonStyle}"
+                            Command="{Binding ImprimerSectionCommand}"
+                            CommandParameter="{Binding SelectedTabLetter}"
+                            Background="#374151" Foreground="White"/>
+                    <Button Content="✕ Fermer" Style="{StaticResource ActionButtonStyle}"
+                            Click="BtnFermer_Click"
+                            Background="#6B7280" Foreground="White"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Onglets A→J du carnet -->
+        <TabControl SelectedIndex="{Binding OngletActif}" Margin="10"
+                    Background="White">
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET A : ÉTAT CIVIL                  -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="A - État Civil">
+                <ScrollViewer Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="A. ÉTAT CIVIL" Style="{StaticResource SectionTitleStyle}"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                <TextBlock Text="Nom *" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.Nom, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+
+                                <TextBlock Text="Prénoms *" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.Prenoms, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+
+                                <TextBlock Text="Date de naissance *" Style="{StaticResource FieldLabelStyle}"/>
+                                <DatePicker SelectedDate="{Binding Patient.EtatCivil.DateNaissance}"
+                                            Padding="8,6" FontSize="13" IsEnabled="{Binding EstMedecin}"/>
+
+                                <TextBlock Text="Lieu de naissance *" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.LieuNaissance, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+
+                                <TextBlock Text="Sexe" Style="{StaticResource FieldLabelStyle}"/>
+                                <ComboBox SelectedValue="{Binding Patient.EtatCivil.Sexe}"
+                                          SelectedValuePath="Tag" Padding="8,6" FontSize="13"
+                                          IsEnabled="{Binding EstMedecin}">
+                                    <ComboBoxItem Content="Masculin" Tag="1"/>
+                                    <ComboBoxItem Content="Féminin" Tag="2"/>
+                                    <ComboBoxItem Content="Autre" Tag="3"/>
+                                </ComboBox>
+
+                                <TextBlock Text="Groupe Sanguin" Style="{StaticResource FieldLabelStyle}"/>
+                                <ComboBox SelectedValue="{Binding Patient.EtatCivil.GroupeSanguin}"
+                                          Padding="8,6" IsEnabled="{Binding EstMedecin}">
+                                    <ComboBoxItem Content="A+"/>
+                                    <ComboBoxItem Content="A-"/>
+                                    <ComboBoxItem Content="B+"/>
+                                    <ComboBoxItem Content="B-"/>
+                                    <ComboBoxItem Content="AB+"/>
+                                    <ComboBoxItem Content="AB-"/>
+                                    <ComboBoxItem Content="O+"/>
+                                    <ComboBoxItem Content="O-"/>
+                                    <ComboBoxItem Content="Inconnu"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Matricule" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.NumeroMatricule, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+
+                                <TextBlock Text="Corps / Entité" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.Corps, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+
+                                <TextBlock Text="Grade" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.Grade, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+
+                                <TextBlock Text="Unité" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.Unite, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+
+                                <TextBlock Text="Téléphone" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.Telephone, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+
+                                <TextBlock Text="N° CNI" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.NumeroCNI, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- FILIATIONS -->
+                        <TextBlock Text="FILIATIONS" Style="{StaticResource SectionTitleStyle}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                <TextBlock Text="Nom du père" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.NomPere, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                                <TextBlock Text="Prénoms du père" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.PrenomsPere, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Nom de la mère" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.NomMere, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                                <TextBlock Text="Prénoms de la mère" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.EtatCivil.PrenomsMere, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- CONTACTS D'URGENCE -->
+                        <Grid Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="CONTACTS D'URGENCE"
+                                       Style="{StaticResource SectionTitleStyle}"/>
+                            <Button Grid.Column="1" Content="+ Ajouter Contact"
+                                    Click="BtnAjouterContact_Click"
+                                    Background="#1A3A5C" Foreground="White"
+                                    BorderThickness="0" Padding="10,6" Cursor="Hand"
+                                    IsEnabled="{Binding EstMedecin}"
+                                    VerticalAlignment="Center"/>
+                        </Grid>
+                        <DataGrid ItemsSource="{Binding Patient.EtatCivil.ContactsUrgence}"
+                                  AutoGenerateColumns="False" CanUserAddRows="False"
+                                  IsReadOnly="{Binding EstLectureSeule}"
+                                  Background="White" BorderBrush="#E2E8F0" Margin="0,0,0,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nom Complet" Width="180"
+                                                    Binding="{Binding NomComplet}"/>
+                                <DataGridTextColumn Header="Lien de parenté" Width="130"
+                                                    Binding="{Binding LienParente}"/>
+                                <DataGridTextColumn Header="Téléphone" Width="120"
+                                                    Binding="{Binding Telephone}"/>
+                                <DataGridTextColumn Header="Adresse" Width="*"
+                                                    Binding="{Binding Adresse}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET B : CONSTANTES                  -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="B - Constantes">
+                <DockPanel Margin="15">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="B. CONSTANTES MÉDICALES"
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,0"/>
+                        <Button Grid.Column="1" Content="+ Nouvelle Mesure"
+                                Command="{Binding NouvelleConstanteCommand}"
+                                Background="#1A3A5C" Foreground="White"
+                                BorderThickness="0" Padding="12,7" Cursor="Hand"/>
+                    </Grid>
+
+                    <DataGrid ItemsSource="{Binding Patient.Constantes}"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              IsReadOnly="True" Background="White" BorderBrush="#E2E8F0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date" Width="90"
+                                                Binding="{Binding DateMesure, StringFormat='dd/MM/yyyy'}"/>
+                            <DataGridTextColumn Header="Taille (cm)" Width="80"
+                                                Binding="{Binding Taille}"/>
+                            <DataGridTextColumn Header="Poids (kg)" Width="80"
+                                                Binding="{Binding Poids}"/>
+                            <DataGridTextColumn Header="IMC" Width="60"
+                                                Binding="{Binding IMC}"/>
+                            <DataGridTextColumn Header="Périm. Thor." Width="90"
+                                                Binding="{Binding PerimethreThoracique}"/>
+                            <DataGridTextColumn Header="Périm. Abd." Width="90"
+                                                Binding="{Binding PerimetreAbdominal}"/>
+                            <DataGridTextColumn Header="T.A. Sys." Width="75"
+                                                Binding="{Binding TensionSystolique}"/>
+                            <DataGridTextColumn Header="T.A. Dia." Width="75"
+                                                Binding="{Binding TensionDiastolique}"/>
+                            <DataGridTextColumn Header="Glycémie" Width="80"
+                                                Binding="{Binding Glycemie}"/>
+                            <DataGridTextColumn Header="Albumine" Width="75"
+                                                Binding="{Binding Albumine}"/>
+                            <DataGridTextColumn Header="Médecin" Width="*"
+                                                Binding="{Binding MedecinMesureur}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET C : EXAMEN D'INCORPORATION      -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="C - Examen Incorporation">
+                <ScrollViewer Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="C. EXAMEN MÉDICAL D'INCORPORATION"
+                                   Style="{StaticResource SectionTitleStyle}"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                <TextBlock Text="Date d'examen" Style="{StaticResource FieldLabelStyle}"/>
+                                <DatePicker SelectedDate="{Binding Patient.ExamenIncorporation.DateExamen}"
+                                            Padding="8,6" IsEnabled="{Binding EstMedecin}"/>
+                                <TextBlock Text="Médecin examinateur" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.MedecinExaminateur}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Aptitude médicale" Style="{StaticResource FieldLabelStyle}"/>
+                                <ComboBox SelectedValue="{Binding Patient.ExamenIncorporation.AptitudeMedicale}"
+                                          Padding="8,6" IsEnabled="{Binding EstMedecin}">
+                                    <ComboBoxItem Content="Apte"/>
+                                    <ComboBoxItem Content="Inapte"/>
+                                    <ComboBoxItem Content="À surveiller"/>
+                                    <ComboBoxItem Content="Apte limité"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="ANTÉCÉDENTS" Style="{StaticResource SectionTitleStyle}"/>
+                        <TextBlock Text="Héréditaires" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ExamenIncorporation.AntecedentsHeredita}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="60"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+                        <TextBlock Text="Personnels" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ExamenIncorporation.AntecedentsPersonnels}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="60"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+                        <TextBlock Text="Collatéraux" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ExamenIncorporation.AntecedentsCollateraux}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="60"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+
+                        <TextBlock Text="APPAREILS ET SYSTÈMES" Style="{StaticResource SectionTitleStyle}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Appareil respiratoire" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.AppareilRespiratoire}"
+                                         Style="{StaticResource FieldBoxStyle}" Height="50"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+                                <TextBlock Text="Appareil digestif" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.AppareilDigestif}"
+                                         Style="{StaticResource FieldBoxStyle}" Height="50"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+                                <TextBlock Text="Appareil circulatoire" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.AppareilCirculatoire}"
+                                         Style="{StaticResource FieldBoxStyle}" Height="50"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+                                <TextBlock Text="Génito-urinaire" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.AppareilGenitourinaire}"
+                                         Style="{StaticResource FieldBoxStyle}" Height="50"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Système nerveux" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.SystemeNerveux}"
+                                         Style="{StaticResource FieldBoxStyle}" Height="50"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+                                <TextBlock Text="Denture" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.Denture}"
+                                         Style="{StaticResource FieldBoxStyle}" Height="50"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+                                <TextBlock Text="Peau et annexes" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.PeauAnnexes}"
+                                         Style="{StaticResource FieldBoxStyle}" Height="50"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- VISION ET AUDITION -->
+                        <TextBlock Text="VISION" Style="{StaticResource SectionTitleStyle}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="5">
+                                <TextBlock Text="OD sans correction" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.VisionODSansCorrection}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="5">
+                                <TextBlock Text="OD avec correction" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.VisionODAvecCorrection}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Margin="5">
+                                <TextBlock Text="OG sans correction" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.VisionOGSansCorrection}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Margin="5">
+                                <TextBlock Text="OG avec correction" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ExamenIncorporation.VisionOGAvecCorrection}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Mentions médicales spéciales" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ExamenIncorporation.MentionsMedicalesSpeciales}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="70"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET D : OPÉRATIONS MÉDICALES        -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="D - Opérations">
+                <DockPanel Margin="15">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="D. OPÉRATIONS MÉDICALES"
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0"/>
+                        <Button Grid.Column="1" Content="+ Nouvelle Opération"
+                                Click="BtnNouvelleOperation_Click"
+                                Background="#1A3A5C" Foreground="White"
+                                BorderThickness="0" Padding="12,7" Cursor="Hand"
+                                IsEnabled="{Binding EstMedecin}"/>
+                    </Grid>
+                    <DataGrid ItemsSource="{Binding Patient.OperationsMedicales}"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              IsReadOnly="True" Background="White" BorderBrush="#E2E8F0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date" Width="90"
+                                                Binding="{Binding DateOperation, StringFormat='dd/MM/yyyy'}"/>
+                            <DataGridTextColumn Header="Diagnostic" Width="200" Binding="{Binding Diagnostic}"/>
+                            <DataGridTextColumn Header="Type" Width="120" Binding="{Binding TypeIntervention}"/>
+                            <DataGridTextColumn Header="Lieu" Width="150" Binding="{Binding LieuSejour}"/>
+                            <DataGridTextColumn Header="Médecin" Width="*" Binding="{Binding SignatureMedecin}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET E : VACCINATIONS                -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="E - Vaccinations">
+                <DockPanel Margin="15">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="E. VACCINATIONS ET IMMUNISATIONS"
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0"/>
+                        <Button Grid.Column="1" Content="+ Nouvelle Vaccination"
+                                Command="{Binding NouvelleVaccinationCommand}"
+                                Background="#1A3A5C" Foreground="White"
+                                BorderThickness="0" Padding="12,7" Cursor="Hand"/>
+                    </Grid>
+                    <DataGrid ItemsSource="{Binding Patient.Vaccinations}"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              IsReadOnly="True" Background="White" BorderBrush="#E2E8F0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Vaccin" Width="150" Binding="{Binding NomVaccin}"/>
+                            <DataGridTextColumn Header="Type" Width="120" Binding="{Binding TypeVaccin}"/>
+                            <DataGridTextColumn Header="Date" Width="90"
+                                                Binding="{Binding DateVaccination, StringFormat='dd/MM/yyyy'}"/>
+                            <DataGridTextColumn Header="Dose n°" Width="70" Binding="{Binding NumeroDose}"/>
+                            <DataGridTextColumn Header="N° Lot" Width="100" Binding="{Binding NumeroLot}"/>
+                            <DataGridTextColumn Header="Médecin vaccinateur" Width="150"
+                                                Binding="{Binding MedecinVaccinateur}"/>
+                            <DataGridTextColumn Header="Validité" Width="*"
+                                                Binding="{Binding DateExpiration, StringFormat='MM/yyyy'}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET F : VISITES SANITAIRES          -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="F - Visites Sanitaires">
+                <DockPanel Margin="15">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="F. VISITES SANITAIRES"
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0"/>
+                        <Button Grid.Column="1" Content="+ Nouvelle Visite"
+                                Command="{Binding NouvelleVisiteCommand}"
+                                Background="#1A3A5C" Foreground="White"
+                                BorderThickness="0" Padding="12,7" Cursor="Hand"/>
+                    </Grid>
+                    <DataGrid ItemsSource="{Binding Patient.VisitesSanitaires}"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              IsReadOnly="True" Background="White" BorderBrush="#E2E8F0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date" Width="90"
+                                                Binding="{Binding DateVisite, StringFormat='dd/MM/yyyy'}"/>
+                            <DataGridTextColumn Header="Entité médicale" Width="180" Binding="{Binding EntiteMedicale}"/>
+                            <DataGridTextColumn Header="Type visite" Width="120" Binding="{Binding TypeVisite}"/>
+                            <DataGridTextColumn Header="Résultats" Width="*" Binding="{Binding ResultatsVisite}"/>
+                            <DataGridTextColumn Header="Médecin" Width="140" Binding="{Binding NomMedecin}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET G : INDISPONIBILITÉS            -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="G - Indisponibilités">
+                <DockPanel Margin="15">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="G. INDISPONIBILITÉS POUR RAISON DE SANTÉ"
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0"/>
+                        <Button Grid.Column="1" Content="+ Nouvelle Indisponibilité"
+                                Command="{Binding NouvelleIndisponibiliteCommand}"
+                                Background="#DC2626" Foreground="White"
+                                BorderThickness="0" Padding="12,7" Cursor="Hand"/>
+                    </Grid>
+                    <DataGrid ItemsSource="{Binding Patient.Indisponibilites}"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              IsReadOnly="True" Background="White" BorderBrush="#E2E8F0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Début" Width="90"
+                                                Binding="{Binding DateDebut, StringFormat='dd/MM/yyyy'}"/>
+                            <DataGridTextColumn Header="Fin" Width="90"
+                                                Binding="{Binding DateFin, StringFormat='dd/MM/yyyy'}"/>
+                            <DataGridTextColumn Header="Durée (j)" Width="80" Binding="{Binding DureePrescrite}"/>
+                            <DataGridTextColumn Header="Motif" Width="*" Binding="{Binding Motif}"/>
+                            <DataGridTextColumn Header="Diagnostic" Width="200" Binding="{Binding Diagnostic}"/>
+                            <DataGridTextColumn Header="Lieu" Width="140" Binding="{Binding LieuSejour}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET H : CERTIFICATS MÉDICAUX        -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="H - Certificats">
+                <DockPanel Margin="15">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="H. CERTIFICATS MÉDICAUX"
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0"/>
+                        <Button Grid.Column="1" Content="+ Nouveau Certificat"
+                                Command="{Binding NouveauCertificatCommand}"
+                                Background="#16A34A" Foreground="White"
+                                BorderThickness="0" Padding="12,7" Cursor="Hand"/>
+                    </Grid>
+                    <DataGrid ItemsSource="{Binding Patient.CertificatsMedicaux}"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              IsReadOnly="True" Background="White" BorderBrush="#E2E8F0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date" Width="90"
+                                                Binding="{Binding DateCertificat, StringFormat='dd/MM/yyyy'}"/>
+                            <DataGridTextColumn Header="Type" Width="180" Binding="{Binding TypeCertificat}"/>
+                            <DataGridTextColumn Header="Objet" Width="*" Binding="{Binding Objet}"/>
+                            <DataGridTextColumn Header="Médecin signataire" Width="160"
+                                                Binding="{Binding MedecinSignataire}"/>
+                            <DataGridTextColumn Header="Fichier joint" Width="100"
+                                                Binding="{Binding FichierNom}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET I : DÉCISIONS DE RÉFORME        -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="I - Comm. Réforme">
+                <DockPanel Margin="15">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="I. DÉCISIONS DES COMMISSIONS DE RÉFORME"
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0"/>
+                        <Button Grid.Column="1" Content="+ Nouvelle Décision"
+                                Command="{Binding NouvelleDecisionReformeCommand}"
+                                Background="#7C3AED" Foreground="White"
+                                BorderThickness="0" Padding="12,7" Cursor="Hand"/>
+                    </Grid>
+                    <DataGrid ItemsSource="{Binding Patient.DecisionsReforme}"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              IsReadOnly="True" Background="White" BorderBrush="#E2E8F0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="N° Décision" Width="110" Binding="{Binding NumeroDecision}"/>
+                            <DataGridTextColumn Header="Date" Width="90"
+                                                Binding="{Binding DateDecision, StringFormat='dd/MM/yyyy'}"/>
+                            <DataGridTextColumn Header="Diagnostic" Width="*" Binding="{Binding Diagnostic}"/>
+                            <DataGridTextColumn Header="Décision" Width="150" Binding="{Binding Decision}"/>
+                            <DataGridTextColumn Header="Taux invalidité" Width="100"
+                                                Binding="{Binding TauxInvalidite}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <!-- ═══════════════════════════════════════ -->
+            <!-- ONGLET J : CONTRÔLE FIN DE SERVICE     -->
+            <!-- ═══════════════════════════════════════ -->
+            <TabItem Header="J - Fin de Service">
+                <ScrollViewer Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="J. CONTRÔLE DE FIN DE SERVICE"
+                                   Style="{StaticResource SectionTitleStyle}"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                <TextBlock Text="Date du contrôle" Style="{StaticResource FieldLabelStyle}"/>
+                                <DatePicker SelectedDate="{Binding Patient.ControleFinService.DateControle}"
+                                            Padding="8,6" IsEnabled="{Binding EstMedecin}"/>
+                                <TextBlock Text="Aptitude à rejoindre le foyer" Style="{StaticResource FieldLabelStyle}"/>
+                                <ComboBox Padding="8,6" IsEnabled="{Binding EstMedecin}">
+                                    <ComboBoxItem Content="Apte"/>
+                                    <ComboBoxItem Content="Inapte"/>
+                                    <ComboBoxItem Content="Apte avec réserves"/>
+                                </ComboBox>
+                                <TextBlock Text="Date fin de service" Style="{StaticResource FieldLabelStyle}"/>
+                                <DatePicker SelectedDate="{Binding Patient.ControleFinService.DateFinService}"
+                                            Padding="8,6" IsEnabled="{Binding EstMedecin}"/>
+                                <TextBlock Text="Date de radiation" Style="{StaticResource FieldLabelStyle}"/>
+                                <DatePicker SelectedDate="{Binding Patient.ControleFinService.DateRadiation}"
+                                            Padding="8,6" IsEnabled="{Binding EstMedecin}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Médecin signataire" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ControleFinService.MedecinSignataire}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                                <TextBlock Text="Total jours d'indisponibilité" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ControleFinService.TotalJoursIndisponibilite}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="True"/>
+                                <TextBlock Text="N° Décision de radiation" Style="{StaticResource FieldLabelStyle}"/>
+                                <TextBox Text="{Binding Patient.ControleFinService.NumeroDecisionRadiation}"
+                                         Style="{StaticResource FieldBoxStyle}" IsReadOnly="{Binding EstLectureSeule}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Examen final" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ControleFinService.ExamenFinal}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="80"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+
+                        <TextBlock Text="État de santé" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ControleFinService.EtatDeSante}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="80"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+
+                        <TextBlock Text="Recommandations médicales" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ControleFinService.RecommandationsMedicales}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="80"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+
+                        <TextBlock Text="Récapitulatif pathologies" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ControleFinService.RecapitulatifPathologies}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="60"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+
+                        <TextBlock Text="Observations" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Text="{Binding Patient.ControleFinService.Observations}"
+                                 Style="{StaticResource FieldBoxStyle}" Height="60"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 IsReadOnly="{Binding EstLectureSeule}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+    </DockPanel>
+</Window>
