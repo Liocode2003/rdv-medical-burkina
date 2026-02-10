@@ -1,0 +1,27 @@
+## .NET / Visual Studio
+*.user
+*.suo
+.vs/
+bin/
+obj/
+*.cache
+
+## SQLite base de données (données locales, ne pas versionner)
+*.db
+*.db-shm
+*.db-wal
+
+## PDF exportés temporaires
+/exports/
+*.pdf
+
+## Logs
+logs/
+*.log
+
+## Secrets (ne JAMAIS committer)
+appsettings.Production.json
+**/secrets.json
+
+## Build output
+publish/
