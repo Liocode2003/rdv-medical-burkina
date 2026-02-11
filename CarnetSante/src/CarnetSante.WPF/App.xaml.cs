@@ -34,17 +34,8 @@ public partial class App : Application
 
         await InitialiserBaseDeDonneesAsync();
 
-        bool autoConnecte = await TenterAutoConnexionAsync();
-
-        if (autoConnecte)
-        {
-            OuvrirFenetrePrincipale();
-        }
-        else
-        {
-            var loginWindow = GetLoginWindow();
-            loginWindow.Show();
-        }
+        await TenterAutoConnexionAsync();
+        OuvrirFenetrePrincipale();
     }
 
     /// <summary>
@@ -197,13 +188,6 @@ public partial class App : Application
         var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
         var mainWindow = new MainWindow(mainVm,
             () => _serviceProvider!.GetRequiredService<PatientWindow>());
-
-        mainVm.DemanderDeconnexion += () =>
-        {
-            var loginWindow = GetLoginWindow();
-            loginWindow.Show();
-            mainWindow.Close();
-        };
 
         mainWindow.Show();
     }
