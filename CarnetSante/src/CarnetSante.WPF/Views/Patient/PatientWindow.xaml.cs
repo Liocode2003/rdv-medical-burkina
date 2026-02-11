@@ -1,4 +1,5 @@
 using CarnetSante.WPF.ViewModels.Patient;
+using CarnetSante.WPF.Views.Patient.Modules;
 using System.Windows;
 
 namespace CarnetSante.WPF.Views.Patient;
