@@ -20,6 +20,9 @@ public class AuthService : IAuthService
 
     public Utilisateur? UtilisateurCourant => _utilisateurCourant;
 
+    public SessionUtilisateur? SessionCourante =>
+        _utilisateurCourant is null ? null : SessionUtilisateur.FromUtilisateur(_utilisateurCourant);
+
     public async Task<Utilisateur?> ConnecterAsync(string login, string motDePasse)
     {
         var utilisateur = await _utilisateurRepo.GetByLoginAsync(login);
