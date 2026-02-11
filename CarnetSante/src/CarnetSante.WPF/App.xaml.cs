@@ -34,8 +34,17 @@ public partial class App : Application
 
         await InitialiserBaseDeDonneesAsync();
 
-        var loginWindow = GetLoginWindow();
-        loginWindow.Show();
+        bool autoConnecte = await TenterAutoConnexionAsync();
+
+        if (autoConnecte)
+        {
+            OuvrirFenetrePrincipale();
+        }
+        else
+        {
+            var loginWindow = GetLoginWindow();
+            loginWindow.Show();
+        }
     }
 
     /// <summary>
@@ -163,6 +172,40 @@ public partial class App : Application
                 "CarnetSante", "Exports");
 
         return Environment.ExpandEnvironmentVariables(chemin);
+    }
+
+    /// <summary>
+    /// Tente une connexion automatique avec le compte admin par défaut.
+    /// Retourne true si la connexion a réussi.
+    /// </summary>
+    private static async Task<bool> TenterAutoConnexionAsync()
+    {
+        try
+        {
+            // Résolution directe sur le root provider pour que l'état connecté
+            // soit partagé avec le MainViewModel (même instance scoped-as-singleton en WPF).
+            var authService = _serviceProvider!.GetRequiredService<IAuthService>();
+            var utilisateur = await authService.ConnecterAsync("admin", "Admin@2024!");
+            return utilisateur != null;
+        }
+        catch { /* Mot de passe changé ou compte bloqué : afficher le login normalement */ }
+        return false;
+    }
+
+    private static void OuvrirFenetrePrincipale()
+    {
+        var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
+        var mainWindow = new MainWindow(mainVm,
+            () => _serviceProvider!.GetRequiredService<PatientWindow>());
+
+        mainVm.DemanderDeconnexion += () =>
+        {
+            var loginWindow = GetLoginWindow();
+            loginWindow.Show();
+            mainWindow.Close();
+        };
+
+        mainWindow.Show();
     }
 
     public static LoginWindow GetLoginWindow()
