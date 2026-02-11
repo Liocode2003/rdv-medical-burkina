@@ -1,5 +1,6 @@
 using CarnetSante.Core.Models;
 using CarnetSante.Core.Services;
+using System.IO;
 
 namespace CarnetSante.WPF.ViewModels.Patient;
 
@@ -23,6 +24,7 @@ public class PatientViewModel : BaseViewModel
 
         SauvegarderCommand = new AsyncRelayCommand(SauvegarderAsync, () => EstModifie && EstMedecin);
         ImprimerCarnetCommand = new AsyncRelayCommand(ImprimerCarnetAsync);
+        ExporterPdfCommand = new AsyncRelayCommand(ExporterPdfAsync);
         ImprimerSectionCommand = new AsyncRelayCommand<string>(ImprimerSectionAsync);
         NouvelleConstanteCommand = new RelayCommand(NouvelleConstante, () => EstMedecin);
         NouvelleVaccinationCommand = new RelayCommand(NouvelleVaccination, () => EstMedecin);
@@ -87,6 +89,7 @@ public class PatientViewModel : BaseViewModel
     // ── Commandes ─────────────────────────────────────────────
     public AsyncRelayCommand SauvegarderCommand { get; }
     public AsyncRelayCommand ImprimerCarnetCommand { get; }
+    public AsyncRelayCommand ExporterPdfCommand { get; }
     public AsyncRelayCommand<string> ImprimerSectionCommand { get; }
     public RelayCommand NouvelleConstanteCommand { get; }
     public RelayCommand NouvelleVaccinationCommand { get; }
@@ -169,6 +172,28 @@ public class PatientViewModel : BaseViewModel
             await _pdfService.OuvrirPdfAsync(pdf, $"Section_{section}_{Patient.NumeroCarnet}.pdf");
         }
         catch (Exception ex) { ErrorMessage = ex.Message; }
+    }
+
+    private async Task ExporterPdfAsync()
+    {
+        if (Patient == null) return;
+        IsLoading = true;
+        ClearMessages();
+        try
+        {
+            var dossier = App.ObtenirDossierExportPdf();
+            Directory.CreateDirectory(dossier);
+
+            var nomFichier = $"Carnet_{Patient.NumeroCarnet}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            var cheminComplet = Path.Combine(dossier, nomFichier);
+
+            var pdf = await _pdfService.GenererCarnetCompletAsync(Patient);
+            await _pdfService.SauvegarderPdfAsync(pdf, cheminComplet);
+
+            SuccessMessage = $"PDF exporté : {cheminComplet}";
+        }
+        catch (Exception ex) { ErrorMessage = $"Erreur lors de l'export PDF : {ex.Message}"; }
+        finally { IsLoading = false; }
     }
 
     // ── Ajouts dans les modules ───────────────────────────────

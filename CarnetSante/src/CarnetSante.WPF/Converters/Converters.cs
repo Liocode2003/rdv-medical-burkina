@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
+// Converters one-way : ConvertBack retourne Binding.DoNothing (jamais appelé en pratique).
+
 namespace CarnetSante.WPF.Converters;
 
 /// <summary>
@@ -14,7 +16,7 @@ public class NullToVisibilityConverter : IValueConverter
         => string.IsNullOrEmpty(value?.ToString()) ? Visibility.Collapsed : Visibility.Visible;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => Binding.DoNothing;
 }
 
 /// <summary>
@@ -52,7 +54,7 @@ public class LoadingToTextConverter : IValueConverter
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => Binding.DoNothing;
 }
 
 /// <summary>
@@ -74,7 +76,7 @@ public class DateToAgeConverter : IValueConverter
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => Binding.DoNothing;
 }
 
 /// <summary>
