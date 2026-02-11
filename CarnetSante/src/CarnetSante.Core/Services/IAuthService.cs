@@ -10,6 +10,9 @@ public interface IAuthService
     /// <summary>Authentifie un utilisateur. Retourne l'utilisateur ou null si échec.</summary>
     Task<Utilisateur?> ConnecterAsync(string login, string motDePasse);
 
+    /// <summary>Connecte directement un utilisateur par login sans vérification de mot de passe.</summary>
+    Task<Utilisateur?> ConnecterDirectAsync(string login);
+
     /// <summary>Déconnecte l'utilisateur courant.</summary>
     Task DeconnecterAsync();
 

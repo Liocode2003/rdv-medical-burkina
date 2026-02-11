@@ -164,8 +164,11 @@ public partial class App : Application
         return Environment.ExpandEnvironmentVariables(chemin);
     }
 
-    private static void OuvrirFenetrePrincipale()
+    private static async void OuvrirFenetrePrincipale()
     {
+        var authService = _serviceProvider!.GetRequiredService<IAuthService>();
+        await authService.ConnecterDirectAsync("admin");
+
         var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
         var mainWindow = new MainWindow(mainVm,
             () => _serviceProvider!.GetRequiredService<PatientWindow>());

@@ -49,6 +49,16 @@ public class AuthService : IAuthService
         return utilisateur;
     }
 
+    public async Task<Utilisateur?> ConnecterDirectAsync(string login)
+    {
+        var utilisateur = await _utilisateurRepo.GetByLoginAsync(login);
+        if (utilisateur == null) return null;
+
+        await _utilisateurRepo.MettreAJourDerniereConnexionAsync(utilisateur.Id);
+        _utilisateurCourant = utilisateur;
+        return utilisateur;
+    }
+
     public async Task DeconnecterAsync()
     {
         _utilisateurCourant = null;
