@@ -2,42 +2,33 @@ using CarnetSante.Core.Enums;
 
 namespace CarnetSante.Core.Models;
 
-/// <summary>
-/// Table PATIENTS - Entité centrale du carnet de santé.
-/// Correspond à l'en-tête et l'identifiant unique du carnet.
-/// </summary>
 public class Patient : BaseEntity
 {
-    public string NumeroCarnet { get; set; } = string.Empty; // Numéro unique du carnet
-    public string? PhotoPath { get; set; }
+    public string NumeroCarnet { get; set; } = string.Empty;
+    public string Matricule { get; set; } = string.Empty;
+    public string Nom { get; set; } = string.Empty;
+    public string Prenoms { get; set; } = string.Empty;
+    public DateTime DateNaissance { get; set; }
+    public string LieuNaissance { get; set; } = string.Empty;
+    public Sexe Sexe { get; set; }
+    public GroupeSanguin GroupeSanguin { get; set; }
+    public string NationaliteIFO { get; set; } = "Burkinabé";
+    public string Telephone { get; set; } = string.Empty;
+    public string Adresse { get; set; } = string.Empty;
+    public string Photo { get; set; } = string.Empty;
+    public string NomComplet => $"{Nom} {Prenoms}";
+    public int Age => DateTime.Now.Year - DateNaissance.Year;
 
-    // ── MODULE A : ÉTAT CIVIL ──────────────────────────────────
+    // Navigation properties
     public EtatCivil? EtatCivil { get; set; }
-
-    // ── MODULE B : CONSTANTES ──────────────────────────────────
+    public ICollection<ContactUrgence> ContactsUrgence { get; set; } = new List<ContactUrgence>();
     public ICollection<Constante> Constantes { get; set; } = new List<Constante>();
-
-    // ── MODULE C : EXAMEN D'INCORPORATION ─────────────────────
     public ExamenIncorporation? ExamenIncorporation { get; set; }
-
-    // ── MODULE D : OPÉRATIONS MÉDICALES ───────────────────────
     public ICollection<OperationMedicale> OperationsMedicales { get; set; } = new List<OperationMedicale>();
-
-    // ── MODULE E : VACCINATIONS ────────────────────────────────
     public ICollection<Vaccination> Vaccinations { get; set; } = new List<Vaccination>();
-
-    // ── MODULE F : VISITES SANITAIRES ─────────────────────────
     public ICollection<VisiteSanitaire> VisitesSanitaires { get; set; } = new List<VisiteSanitaire>();
-
-    // ── MODULE G : INDISPONIBILITÉS ────────────────────────────
     public ICollection<Indisponibilite> Indisponibilites { get; set; } = new List<Indisponibilite>();
-
-    // ── MODULE H : CERTIFICATS MÉDICAUX ───────────────────────
     public ICollection<CertificatMedical> CertificatsMedicaux { get; set; } = new List<CertificatMedical>();
-
-    // ── MODULE I : DÉCISIONS DE RÉFORME ───────────────────────
-    public ICollection<DecisionReforme> DecisionsReforme { get; set; } = new List<DecisionReforme>();
-
-    // ── MODULE J : CONTRÔLE FIN DE SERVICE ────────────────────
-    public ControleFInService? ControleFinService { get; set; }
+    public ICollection<DecisionReformeMed> DecisionsReforme { get; set; } = new List<DecisionReformeMed>();
+    public ControleFinService? ControleFinService { get; set; }
 }

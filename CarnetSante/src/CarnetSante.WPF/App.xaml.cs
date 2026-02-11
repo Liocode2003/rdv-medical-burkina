@@ -1,17 +1,10 @@
-using CarnetSante.Core.Services;
 using CarnetSante.Data.Context;
 using CarnetSante.Data.Repositories;
+using CarnetSante.Core.Interfaces;
+using CarnetSante.WPF.ViewModels;
 using CarnetSante.WPF.Services;
-using CarnetSante.WPF.ViewModels.Auth;
-using CarnetSante.WPF.ViewModels.Dashboard;
-using CarnetSante.WPF.ViewModels.Patient;
-using CarnetSante.WPF.Views.Auth;
-using CarnetSante.WPF.Views.Dashboard;
-using CarnetSante.WPF.Views.Patient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Windows;
 
@@ -19,199 +12,57 @@ namespace CarnetSante.WPF;
 
 public partial class App : Application
 {
-    private static IServiceProvider? _serviceProvider;
-    private static IConfiguration? _configuration;
+    public static IServiceProvider Services { get; private set; } = null!;
 
-    protected override async void OnStartup(StartupEventArgs e)
+    protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
-        _configuration = ChargerConfiguration();
-
         var services = new ServiceCollection();
         ConfigureServices(services);
-        _serviceProvider = services.BuildServiceProvider();
+        Services = services.BuildServiceProvider();
 
-        await InitialiserBaseDeDonneesAsync();
-
-        await TenterAutoConnexionAsync();
-        OuvrirFenetrePrincipale();
-    }
-
-    /// <summary>
-    /// Charge la configuration depuis appsettings.json et appsettings.Production.json (optionnel).
-    /// Le mot de passe de chiffrement peut aussi être fourni via la variable d'environnement
-    /// CARNETSANTE_DB_PASSWORD.
-    /// </summary>
-    private static IConfiguration ChargerConfiguration()
-    {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-            .AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: false)
-            .AddEnvironmentVariables(prefix: "CARNETSANTE_");
-
-        return builder.Build();
+        // Ensure database exists and is migrated
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.EnsureCreated();
     }
 
     private static void ConfigureServices(ServiceCollection services)
     {
-        services.AddSingleton(_configuration!);
-
-        // ── Base de données SQLite (avec chiffrement optionnel) ──────────
-        string dbPath = Path.Combine(
+        // Database
+        var dbFolder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CarnetSante",
-            "carnet_sante.db");
+            "CarnetSante");
+        Directory.CreateDirectory(dbFolder);
+        var dbPath = Path.Combine(dbFolder, "carnet_sante.db");
 
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException(
-                $"Impossible de créer le répertoire de la base de données : {Path.GetDirectoryName(dbPath)}\n" +
-                $"Vérifiez les droits d'écriture sur le dossier AppData\\Local.", ex);
-        }
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlite($"Data Source={dbPath}"),
+            ServiceLifetime.Transient);
 
-        bool chiffrementActif = _configuration!.GetValue<bool>("Database:ChiffrementActif");
-        string motDePasse = ObtenirMotDePasseBdd();
+        // Repositories
+        services.AddTransient<IPatientRepository, PatientRepository>();
+        services.AddTransient<IConstanteRepository, ConstanteRepository>();
+        services.AddTransient<IEtatCivilRepository, EtatCivilRepository>();
+        services.AddTransient<IContactUrgenceRepository, ContactUrgenceRepository>();
+        services.AddTransient<IExamenIncorporationRepository, ExamenIncorporationRepository>();
+        services.AddTransient<IOperationMedicaleRepository, OperationMedicaleRepository>();
+        services.AddTransient<IVaccinationRepository, VaccinationRepository>();
+        services.AddTransient<IVisiteSanitaireRepository, VisiteSanitaireRepository>();
+        services.AddTransient<IIndisponibiliteRepository, IndisponibiliteRepository>();
+        services.AddTransient<ICertificatMedicalRepository, CertificatMedicalRepository>();
+        services.AddTransient<IDecisionReformeRepository, DecisionReformeRepository>();
+        services.AddTransient<IControleFinServiceRepository, ControleFinServiceRepository>();
 
-        services.AddDbContext<CarnetSanteDbContext>(options =>
-        {
-            if (chiffrementActif && !string.IsNullOrWhiteSpace(motDePasse))
-            {
-                // Connexion SQLCipher avec mot de passe (chiffrement AES-256)
-                options.UseSqlite($"Data Source={dbPath};Password={motDePasse}");
-            }
-            else if (chiffrementActif && string.IsNullOrWhiteSpace(motDePasse))
-            {
-                // Chiffrement demandé mais pas de mot de passe configuré : erreur fatale
-                throw new InvalidOperationException(
-                    "Le chiffrement de la base de données est activé mais aucun mot de passe " +
-                    "n'est configuré. Définissez 'Database:MotDePasseChiffrement' dans " +
-                    "appsettings.Production.json ou la variable d'environnement " +
-                    "CARNETSANTE_Database__MotDePasseChiffrement.");
-            }
-            else
-            {
-                options.UseSqlite($"Data Source={dbPath}");
-            }
-        });
+        // Services
+        services.AddTransient<IPdfService, PdfService>();
+        services.AddTransient<INumeroCarnetService, NumeroCarnetService>();
 
-        // ── Repositories ─────────────────────────────────────
-        services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
-        services.AddScoped<IPatientRepository, PatientRepository>();
-
-        // ── Services métier ──────────────────────────────────
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IAuditService, AuditService>();
-        services.AddScoped<IPatientService, PatientService>();
-        services.AddScoped<IPdfService, PdfService>();
-
-        // ── ViewModels ───────────────────────────────────────
-        services.AddTransient<LoginViewModel>();
+        // ViewModels
         services.AddTransient<MainViewModel>();
-        services.AddTransient<PatientViewModel>();
-
-        // ── Vues ─────────────────────────────────────────────
-        services.AddTransient<LoginWindow>();
-        services.AddTransient<MainWindow>();
-        services.AddTransient<PatientWindow>();
-
-        services.AddLogging(builder => builder.AddDebug());
-    }
-
-    /// <summary>
-    /// Résout le mot de passe de chiffrement par ordre de priorité :
-    /// 1. Variable d'environnement CARNETSANTE_Database__MotDePasseChiffrement
-    /// 2. appsettings.Production.json → Database:MotDePasseChiffrement
-    /// 3. appsettings.json → Database:MotDePasseChiffrement (vide par défaut)
-    /// </summary>
-    private static string ObtenirMotDePasseBdd()
-    {
-        return _configuration!.GetValue<string>("Database:MotDePasseChiffrement") ?? string.Empty;
-    }
-
-    private static async Task InitialiserBaseDeDonneesAsync()
-    {
-        using var scope = _serviceProvider!.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CarnetSanteDbContext>();
-        try
-        {
-            await db.Database.MigrateAsync();
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException(
-                "Échec de l'initialisation de la base de données. " +
-                "Vérifiez que le fichier n'est pas verrouillé par un autre processus " +
-                "et que vous disposez des droits nécessaires.", ex);
-        }
-    }
-
-    /// <summary>
-    /// Résout le chemin du dossier d'export PDF en développant les variables d'environnement
-    /// Windows (ex. %USERPROFILE%) présentes dans la configuration.
-    /// </summary>
-    public static string ObtenirDossierExportPdf()
-    {
-        var chemin = _configuration!.GetValue<string>("PDF:DossierExport")
-            ?? Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "CarnetSante", "Exports");
-
-        return Environment.ExpandEnvironmentVariables(chemin);
-    }
-
-    /// <summary>
-    /// Tente une connexion automatique avec le compte admin par défaut.
-    /// Retourne true si la connexion a réussi.
-    /// </summary>
-    private static async Task<bool> TenterAutoConnexionAsync()
-    {
-        try
-        {
-            // Résolution directe sur le root provider pour que l'état connecté
-            // soit partagé avec le MainViewModel (même instance scoped-as-singleton en WPF).
-            var authService = _serviceProvider!.GetRequiredService<IAuthService>();
-            var utilisateur = await authService.ConnecterAsync("admin", "Admin@2024!");
-            return utilisateur != null;
-        }
-        catch { /* Mot de passe changé ou compte bloqué : afficher le login normalement */ }
-        return false;
-    }
-
-    private static void OuvrirFenetrePrincipale()
-    {
-        var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
-        var mainWindow = new MainWindow(mainVm,
-            () => _serviceProvider!.GetRequiredService<PatientWindow>());
-
-        mainWindow.Show();
-    }
-
-    public static LoginWindow GetLoginWindow()
-    {
-        var loginVm = _serviceProvider!.GetRequiredService<LoginViewModel>();
-        var loginWindow = new LoginWindow(loginVm);
-
-        loginVm.ConnexionReussie += () =>
-        {
-            var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
-            var mainWindow = new MainWindow(mainVm,
-                () => _serviceProvider!.GetRequiredService<PatientWindow>());
-            mainWindow.Show();
-            loginWindow.Close();
-        };
-
-        return loginWindow;
-    }
-
-    protected override void OnExit(ExitEventArgs e)
-    {
-        (_serviceProvider as IDisposable)?.Dispose();
-        base.OnExit(e);
+        services.AddTransient<PatientListViewModel>();
+        services.AddTransient<PatientDetailViewModel>();
+        services.AddTransient<DashboardViewModel>();
     }
 }

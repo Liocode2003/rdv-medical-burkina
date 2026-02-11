@@ -1,100 +1,25 @@
 namespace CarnetSante.Core.Enums;
 
-/// <summary>Rôles utilisateurs du système.</summary>
-public enum UserRole
-{
-    Administrateur = 1,
-    Medecin = 2,
-    Consultation = 3
-}
+public enum Sexe { Masculin, Feminin }
 
-/// <summary>Aptitude médicale d'un patient.</summary>
-public enum AptitudeMedicale
-{
-    Apte = 1,
-    Inapte = 2,
-    ASurveiller = 3,
-    ApteLimite = 4
-}
+public enum GroupeSanguin { AP, AM, BP, BM, ABP, ABM, OP, OM, Inconnu }
 
-/// <summary>Type d'intervention chirurgicale ou médicale.</summary>
-public enum TypeIntervention
-{
-    Chirurgicale = 1,
-    Medicale = 2,
-    Diagnostique = 3,
-    Rehabilitation = 4,
-    Urgence = 5
-}
+public enum Aptitude { Apte, Inapte, ApteLimite, ASurveiller }
 
-/// <summary>Type de vaccin administré.</summary>
 public enum TypeVaccin
 {
-    AntiAmaril = 1,
-    AntiTetanique = 2,
-    AntiMeningite = 3,
-    AntiCovid = 4,
-    AntiHepatiteB = 5,
-    AntiPolio = 6,
-    AntiRage = 7,
-    AntiTyphoide = 8,
-    Autre = 9
+    AntiAmaril, AntiTetanique, AntiMeningite, AntiCovid,
+    AntiHepatiteB, AntiPolio, AntiRage, AntiTyphoide, Autre
 }
 
-/// <summary>Statut d'indisponibilité.</summary>
-public enum StatutIndisponibilite
+public enum TypeIntervention
 {
-    EnCours = 1,
-    Terminee = 2,
-    Prolongee = 3
+    Chirurgicale, Medicale, Diagnostique, Rehabilitation, Urgence
 }
 
-/// <summary>Type de décision de commission de réforme.</summary>
-public enum TypeDecisionReforme
+public enum DecisionReforme
 {
-    Maintien = 1,
-    RefomeDefinitive = 2,
-    RefomeTemporaire = 3,
-    Reengagement = 4,
-    Reclassement = 5
+    Maintien, ReformeDefinitive, ReformeTemporaire, Reengagement, Reclassement
 }
 
-/// <summary>Sexe du patient.</summary>
-public enum Sexe
-{
-    Masculin = 1,
-    Feminin = 2,
-    Autre = 3
-}
-
-/// <summary>Groupe sanguin.</summary>
-public enum GroupeSanguin
-{
-    APositif = 1,
-    ANegatif = 2,
-    BPositif = 3,
-    BNegatif = 4,
-    ABPositif = 5,
-    ABNegatif = 6,
-    OPositif = 7,
-    ONegatif = 8,
-    Inconnu = 9
-}
-
-/// <summary>Type d'action pour le journal d'audit.</summary>
-public enum TypeAction
-{
-    Connexion = 1,
-    Deconnexion = 2,
-    CreationPatient = 3,
-    ModificationPatient = 4,
-    SuppressionPatient = 5,
-    ConsultationDossier = 6,
-    AjoutDonnee = 7,
-    ModificationDonnee = 8,
-    SuppressionDonnee = 9,
-    Impression = 10,
-    ExportPDF = 11,
-    Sauvegarde = 12,
-    Restauration = 13
-}
+public enum StatutDocument { Actif, Archive, Supprime }

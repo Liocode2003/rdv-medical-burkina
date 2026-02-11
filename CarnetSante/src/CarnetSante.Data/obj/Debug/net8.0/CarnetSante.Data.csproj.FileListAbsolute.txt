@@ -1,0 +1,17 @@
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/bin/Debug/net8.0/CarnetSante.Data.deps.json
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/bin/Debug/net8.0/CarnetSante.Data.runtimeconfig.json
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/bin/Debug/net8.0/CarnetSante.Data.dll
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/bin/Debug/net8.0/CarnetSante.Data.pdb
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/bin/Debug/net8.0/CarnetSante.Core.dll
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/bin/Debug/net8.0/CarnetSante.Core.pdb
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.csproj.AssemblyReference.cache
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.GeneratedMSBuildEditorConfig.editorconfig
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.AssemblyInfoInputs.cache
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.AssemblyInfo.cs
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.csproj.CoreCompileInputs.cache
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.csproj.CopyComplete
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.dll
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/refint/CarnetSante.Data.dll
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.pdb
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/CarnetSante.Data.genruntimeconfig.cache
+/home/user/rdv-medical-burkina/CarnetSante/src/CarnetSante.Data/obj/Debug/net8.0/ref/CarnetSante.Data.dll

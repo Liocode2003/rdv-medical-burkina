@@ -1,0 +1,950 @@
+<UserControl x:Class="CarnetSante.WPF.Views.PatientDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ TOP BAR ═══ -->
+        <Border Grid.Row="0" Background="White" BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,0,0,1" Padding="24,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Command="{Binding BackCommand}"
+                        Style="{StaticResource BtnSecondary}"
+                        Content="← Retour" Margin="0,0,16,0"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PageTitle}" FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondaryBrush}">
+                        <Run Text="N° "/>
+                        <Run Text="{Binding NumeroCarnet, Mode=OneWay}"/>
+                        <Run Text=" | Matricule: "/>
+                        <Run Text="{Binding Matricule, Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Command="{Binding ExportPdfCommand}"
+                            Style="{StaticResource BtnSecondary}"
+                            Content="📄 Exporter PDF" Margin="0,0,8,0"/>
+                    <Button Command="{Binding SavePatientCommand}"
+                            Style="{StaticResource BtnPrimary}"
+                            Content="💾 Enregistrer" Width="140"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══ TABS ═══ -->
+        <TabControl Grid.Row="1" Margin="24,16" BorderThickness="0"
+                    Background="Transparent">
+            <TabControl.Resources>
+                <Style TargetType="TabItem" BasedOn="{StaticResource ModuleTab}"/>
+            </TabControl.Resources>
+
+            <!-- ── A - IDENTITÉ & ÉTAT CIVIL ── -->
+            <TabItem Header="A – Identité">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
+                    <StackPanel>
+                        <!-- Identité principale -->
+                        <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Identité du Patient" Style="{StaticResource SectionHeader}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="16"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="16"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="12"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="12"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Row 0 -->
+                                    <StackPanel Grid.Row="0" Grid.Column="0">
+                                        <TextBlock Text="NOM" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding Nom, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="2">
+                                        <TextBlock Text="PRÉNOMS" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding Prenoms, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="4">
+                                        <TextBlock Text="N° CARNET" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding NumeroCarnet, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+
+                                    <!-- Row 2 -->
+                                    <StackPanel Grid.Row="2" Grid.Column="0">
+                                        <TextBlock Text="DATE DE NAISSANCE" Style="{StaticResource LblField}"/>
+                                        <DatePicker SelectedDate="{Binding DateNaissance}"
+                                                    Style="{StaticResource DpField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2">
+                                        <TextBlock Text="LIEU DE NAISSANCE" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding LieuNaissance, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="4">
+                                        <TextBlock Text="MATRICULE" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding Matricule, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+
+                                    <!-- Row 4 -->
+                                    <StackPanel Grid.Row="4" Grid.Column="0">
+                                        <TextBlock Text="SEXE" Style="{StaticResource LblField}"/>
+                                        <ComboBox ItemsSource="{Binding ListeSexe}"
+                                                  SelectedItem="{Binding Sexe}"
+                                                  Style="{StaticResource CbField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="2">
+                                        <TextBlock Text="GROUPE SANGUIN" Style="{StaticResource LblField}"/>
+                                        <ComboBox ItemsSource="{Binding ListeGroupeSanguin}"
+                                                  SelectedItem="{Binding GroupeSanguin}"
+                                                  Style="{StaticResource CbField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="4">
+                                        <TextBlock Text="TÉLÉPHONE" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding Telephone, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel Margin="0,12,0,0">
+                                    <TextBlock Text="ADRESSE" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding Adresse, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- État civil -->
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="État Civil" Style="{StaticResource SectionHeader}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="16"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="16"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="12"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="12"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="0">
+                                        <TextBlock Text="SITUATION MATRIMONIALE" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding SituationMatrimoniale}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="2">
+                                        <TextBlock Text="NOM DU PÈRE" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding NomPere}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="4">
+                                        <TextBlock Text="NOM DE LA MÈRE" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding NomMere}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Grid.Column="0">
+                                        <TextBlock Text="NOMBRE D'ENFANTS" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding NombreEnfants}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2">
+                                        <TextBlock Text="PROFESSION" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding Profession}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="4">
+                                        <TextBlock Text="CORPS" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding Corps}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="4" Grid.Column="0">
+                                        <TextBlock Text="GRADE" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding Grade}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="2">
+                                        <TextBlock Text="AFFECTATION" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding Affectation}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="4">
+                                        <TextBlock Text="SERVICE D'ORIGINE" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding ServiceOrigine}" Style="{StaticResource TxtField}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="16"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="DATE D'INTÉGRATION" Style="{StaticResource LblField}"/>
+                                        <DatePicker SelectedDate="{Binding DateIntegration}" Style="{StaticResource DpField}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="OBSERVATIONS" Style="{StaticResource LblField}"/>
+                                        <TextBox Text="{Binding ObservationsEtatCivil}" Style="{StaticResource TxtMultiline}" MinHeight="60"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ── B - CONSTANTES ── -->
+            <TabItem Header="B – Constantes">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Form -->
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Nouvelle Mesure" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="DATE" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding EditingConstante.DateMesure}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="POIDS (kg)" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingConstante.Poids}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="TAILLE (cm)" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingConstante.Taille}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="TA (ex: 120/80)" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingConstante.TensionArterielle}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="8">
+                                    <TextBlock Text="FC (bpm)" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingConstante.FrequenceCardiaque}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="10">
+                                    <TextBlock Text="TEMP. (°C)" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingConstante.Temperature}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="12">
+                                    <TextBlock Text="GLYCÉMIE (g/L)" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingConstante.Glycemie}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <Button Grid.Column="14" Command="{Binding SaveConstanteCommand}"
+                                        Style="{StaticResource BtnPrimary}"
+                                        Content="Ajouter" VerticalAlignment="Bottom" Height="38"/>
+                            </Grid>
+                            <StackPanel Margin="0,12,0,0">
+                                <TextBlock Text="MÉDECIN RESPONSABLE" Style="{StaticResource LblField}"/>
+                                <TextBox Text="{Binding EditingConstante.MedecinResponsable}" Style="{StaticResource TxtField}" Width="300" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Liste -->
+                    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+                        <DataGrid ItemsSource="{Binding Constantes}"
+                                  SelectedItem="{Binding SelectedConstante}"
+                                  Style="{StaticResource ProDataGrid}" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DATE" Width="110">
+                                    <DataGridTextColumn.Binding>
+                                        <Binding Path="DateMesure" StringFormat="{}{0:dd/MM/yyyy}"/>
+                                    </DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="POIDS (kg)" Binding="{Binding Poids}" Width="90"/>
+                                <DataGridTextColumn Header="TAILLE (cm)" Binding="{Binding Taille}" Width="90"/>
+                                <DataGridTextColumn Header="IMC" Binding="{Binding IMC}" Width="70"/>
+                                <DataGridTextColumn Header="TA" Binding="{Binding TensionArterielle}" Width="100"/>
+                                <DataGridTextColumn Header="FC (bpm)" Binding="{Binding FrequenceCardiaque}" Width="80"/>
+                                <DataGridTextColumn Header="TEMP. (°C)" Binding="{Binding Temperature}" Width="90"/>
+                                <DataGridTextColumn Header="GLYCÉMIE" Binding="{Binding Glycemie}" Width="90"/>
+                                <DataGridTextColumn Header="MÉDECIN" Binding="{Binding MedecinResponsable}" Width="*"/>
+                                <DataGridTemplateColumn Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.DeleteConstanteCommand,
+                                                        RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    Style="{StaticResource BtnDanger}"
+                                                    Content="Suppr." Height="28" Padding="8,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ── C - EXAMEN INCORPORATION ── -->
+            <TabItem Header="C – Examen d'Incorporation">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Examen d'Incorporation" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="DATE DE L'EXAMEN" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding DateExamenIncorporation}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="APTITUDE" Style="{StaticResource LblField}"/>
+                                    <ComboBox ItemsSource="{Binding ListeAptitude}"
+                                              SelectedItem="{Binding AptitudeIncorporation}"
+                                              Style="{StaticResource CbField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="MÉDECIN EXAMINATEUR" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding MedecinExaminateur}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Separator Style="{StaticResource HSeparator}" Margin="0,16"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="ANTÉCÉDENTS MÉDICAUX" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding AntecedentsMedicaux}" Style="{StaticResource TxtMultiline}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="ANTÉCÉDENTS CHIRURGICAUX" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding AntecedentsChirurgicaux}" Style="{StaticResource TxtMultiline}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="ANTÉCÉDENTS FAMILIAUX" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding AntecedentsFamiliaux}" Style="{StaticResource TxtMultiline}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="EXAMEN CLINIQUE" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding ExamenClinique}" Style="{StaticResource TxtMultiline}" MinHeight="100"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="EXAMENS COMPLÉMENTAIRES" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding ExamensComplementaires}" Style="{StaticResource TxtMultiline}" MinHeight="100"/>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Margin="0,12,0,0">
+                                <TextBlock Text="CONCLUSION" Style="{StaticResource LblField}"/>
+                                <TextBox Text="{Binding ConclusionExamen}" Style="{StaticResource TxtMultiline}" MinHeight="80"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ── D - OPÉRATIONS ── -->
+            <TabItem Header="D – Opérations">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Nouvelle Opération Médicale" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="DATE" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding EditingOperation.DateOperation}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="INTITULÉ" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingOperation.Intitule}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="TYPE" Style="{StaticResource LblField}"/>
+                                    <ComboBox ItemsSource="{Binding ListeTypeIntervention}"
+                                              SelectedItem="{Binding EditingOperation.TypeIntervention}"
+                                              Style="{StaticResource CbField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="CHIRURGIEN" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingOperation.Chirurgien}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="8">
+                                    <TextBlock Text="ÉTABLISSEMENT" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingOperation.Etablissement}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <Button Grid.Column="10" Command="{Binding SaveOperationCommand}"
+                                        Style="{StaticResource BtnPrimary}"
+                                        Content="Ajouter" VerticalAlignment="Bottom" Height="38"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+                        <DataGrid ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedOperation}"
+                                  Style="{StaticResource ProDataGrid}" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DATE" Width="100">
+                                    <DataGridTextColumn.Binding><Binding Path="DateOperation" StringFormat="{}{0:dd/MM/yyyy}"/></DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="INTITULÉ" Binding="{Binding Intitule}" Width="*"/>
+                                <DataGridTextColumn Header="TYPE" Binding="{Binding TypeIntervention}" Width="130"/>
+                                <DataGridTextColumn Header="CHIRURGIEN" Binding="{Binding Chirurgien}" Width="150"/>
+                                <DataGridTextColumn Header="ÉTABLISSEMENT" Binding="{Binding Etablissement}" Width="160"/>
+                                <DataGridTemplateColumn Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.DeleteOperationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    Style="{StaticResource BtnDanger}" Content="Suppr." Height="28" Padding="8,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ── E - VACCINATIONS ── -->
+            <TabItem Header="E – Vaccinations">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Enregistrer une Vaccination" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="DATE" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding EditingVaccination.DateVaccination}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="TYPE VACCIN" Style="{StaticResource LblField}"/>
+                                    <ComboBox ItemsSource="{Binding ListeTypeVaccin}"
+                                              SelectedItem="{Binding EditingVaccination.TypeVaccin}"
+                                              Style="{StaticResource CbField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="NOM DU VACCIN" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingVaccination.NomVaccin}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="N° LOT" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingVaccination.Lot}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="8">
+                                    <TextBlock Text="CENTRE" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingVaccination.Centre}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <Button Grid.Column="10" Command="{Binding SaveVaccinationCommand}"
+                                        Style="{StaticResource BtnPrimary}"
+                                        Content="Ajouter" VerticalAlignment="Bottom" Height="38"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+                        <DataGrid ItemsSource="{Binding Vaccinations}" SelectedItem="{Binding SelectedVaccination}"
+                                  Style="{StaticResource ProDataGrid}" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DATE" Width="100">
+                                    <DataGridTextColumn.Binding><Binding Path="DateVaccination" StringFormat="{}{0:dd/MM/yyyy}"/></DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="TYPE" Binding="{Binding TypeVaccin}" Width="130"/>
+                                <DataGridTextColumn Header="NOM VACCIN" Binding="{Binding NomVaccin}" Width="*"/>
+                                <DataGridTextColumn Header="LOT" Binding="{Binding Lot}" Width="100"/>
+                                <DataGridTextColumn Header="CENTRE" Binding="{Binding Centre}" Width="160"/>
+                                <DataGridTextColumn Header="OPÉRATEUR" Binding="{Binding Operateur}" Width="140"/>
+                                <DataGridTemplateColumn Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.DeleteVaccinationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    Style="{StaticResource BtnDanger}" Content="Suppr." Height="28" Padding="8,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ── F - VISITES SANITAIRES ── -->
+            <TabItem Header="F – Visites Sanitaires">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Nouvelle Visite Sanitaire" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="DATE" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding EditingVisite.DateVisite}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="MOTIF" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingVisite.Motif}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="ÉTABLISSEMENT" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingVisite.Etablissement}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="MÉDECIN TRAITANT" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingVisite.MedecinTraitant}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <Button Grid.Column="8" Command="{Binding SaveVisiteCommand}"
+                                        Style="{StaticResource BtnPrimary}"
+                                        Content="Ajouter" VerticalAlignment="Bottom" Height="38"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+                        <DataGrid ItemsSource="{Binding Visites}" SelectedItem="{Binding SelectedVisite}"
+                                  Style="{StaticResource ProDataGrid}" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DATE" Width="100">
+                                    <DataGridTextColumn.Binding><Binding Path="DateVisite" StringFormat="{}{0:dd/MM/yyyy}"/></DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="MOTIF" Binding="{Binding Motif}" Width="*"/>
+                                <DataGridTextColumn Header="ÉTABLISSEMENT" Binding="{Binding Etablissement}" Width="180"/>
+                                <DataGridTextColumn Header="MÉDECIN" Binding="{Binding MedecinTraitant}" Width="160"/>
+                                <DataGridTextColumn Header="DIAGNOSTIC" Binding="{Binding Diagnostic}" Width="180"/>
+                                <DataGridTextColumn Header="DURÉE (j)" Binding="{Binding DureeHospitalisation}" Width="80"/>
+                                <DataGridTemplateColumn Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.DeleteVisiteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    Style="{StaticResource BtnDanger}" Content="Suppr." Height="28" Padding="8,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ── G - INDISPONIBILITÉS ── -->
+            <TabItem Header="G – Indisponibilités">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Nouvelle Indisponibilité" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="DÉBUT" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding EditingIndispo.DateDebut}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="FIN" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding EditingIndispo.DateFin}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="TYPE" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingIndispo.TypeIndisponibilite}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="MOTIF" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingIndispo.Motif}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="8">
+                                    <TextBlock Text="AUTORITÉ DE DÉCISION" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingIndispo.AutoriteDecision}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <Button Grid.Column="10" Command="{Binding SaveIndispoCommand}"
+                                        Style="{StaticResource BtnPrimary}"
+                                        Content="Ajouter" VerticalAlignment="Bottom" Height="38"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+                        <DataGrid ItemsSource="{Binding Indisponibilites}" SelectedItem="{Binding SelectedIndispo}"
+                                  Style="{StaticResource ProDataGrid}" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DÉBUT" Width="100">
+                                    <DataGridTextColumn.Binding><Binding Path="DateDebut" StringFormat="{}{0:dd/MM/yyyy}"/></DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="FIN" Width="100">
+                                    <DataGridTextColumn.Binding><Binding Path="DateFin" StringFormat="{}{0:dd/MM/yyyy}"/></DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="DURÉE (j)" Binding="{Binding DureeJours}" Width="80"/>
+                                <DataGridTextColumn Header="TYPE" Binding="{Binding TypeIndisponibilite}" Width="150"/>
+                                <DataGridTextColumn Header="MOTIF" Binding="{Binding Motif}" Width="*"/>
+                                <DataGridTextColumn Header="AUTORITÉ" Binding="{Binding AutoriteDecision}" Width="180"/>
+                                <DataGridTemplateColumn Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.DeleteIndispoCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    Style="{StaticResource BtnDanger}" Content="Suppr." Height="28" Padding="8,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ── H - CERTIFICATS ── -->
+            <TabItem Header="H – Certificats">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Nouveau Certificat Médical" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="DATE" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding EditingCertificat.DateCertificat}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="TYPE CERTIFICAT" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingCertificat.TypeCertificat}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="MÉDECIN RÉDACTEUR" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingCertificat.MedecinRedacteur}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="RÉFÉRENCE N°" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingCertificat.ReferenceNumero}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <Button Grid.Column="8" Command="{Binding SaveCertificatCommand}"
+                                        Style="{StaticResource BtnPrimary}"
+                                        Content="Ajouter" VerticalAlignment="Bottom" Height="38"/>
+                            </Grid>
+                            <StackPanel Margin="0,12,0,0">
+                                <TextBlock Text="CONTENU DU CERTIFICAT" Style="{StaticResource LblField}"/>
+                                <TextBox Text="{Binding EditingCertificat.Contenu}" Style="{StaticResource TxtMultiline}" MinHeight="80"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+                        <DataGrid ItemsSource="{Binding Certificats}" SelectedItem="{Binding SelectedCertificat}"
+                                  Style="{StaticResource ProDataGrid}" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DATE" Width="100">
+                                    <DataGridTextColumn.Binding><Binding Path="DateCertificat" StringFormat="{}{0:dd/MM/yyyy}"/></DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="TYPE" Binding="{Binding TypeCertificat}" Width="160"/>
+                                <DataGridTextColumn Header="MOTIF" Binding="{Binding Motif}" Width="*"/>
+                                <DataGridTextColumn Header="MÉDECIN" Binding="{Binding MedecinRedacteur}" Width="160"/>
+                                <DataGridTextColumn Header="RÉFÉRENCE" Binding="{Binding ReferenceNumero}" Width="120"/>
+                                <DataGridTemplateColumn Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.DeleteCertificatCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    Style="{StaticResource BtnDanger}" Content="Suppr." Height="28" Padding="8,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ── I - DÉCISIONS RÉFORME ── -->
+            <TabItem Header="I – Décisions Réforme">
+                <Grid Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Nouvelle Décision de Réforme" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="DATE" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding EditingDecision.DateDecision}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="DÉCISION" Style="{StaticResource LblField}"/>
+                                    <ComboBox ItemsSource="{Binding ListeDecisionReforme}"
+                                              SelectedItem="{Binding EditingDecision.Decision}"
+                                              Style="{StaticResource CbField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="APTITUDE CONSTATÉE" Style="{StaticResource LblField}"/>
+                                    <ComboBox ItemsSource="{Binding ListeAptitude}"
+                                              SelectedItem="{Binding EditingDecision.AptitudeConstatee}"
+                                              Style="{StaticResource CbField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="MOTIF" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingDecision.MotifDecision}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="8">
+                                    <TextBlock Text="RÉFERENCE ACTE" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding EditingDecision.ReferenceActe}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <Button Grid.Column="10" Command="{Binding SaveDecisionCommand}"
+                                        Style="{StaticResource BtnPrimary}"
+                                        Content="Ajouter" VerticalAlignment="Bottom" Height="38"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
+                        <DataGrid ItemsSource="{Binding Decisions}" SelectedItem="{Binding SelectedDecision}"
+                                  Style="{StaticResource ProDataGrid}" BorderThickness="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DATE" Width="100">
+                                    <DataGridTextColumn.Binding><Binding Path="DateDecision" StringFormat="{}{0:dd/MM/yyyy}"/></DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="DÉCISION" Binding="{Binding Decision}" Width="160"/>
+                                <DataGridTextColumn Header="APTITUDE" Binding="{Binding AptitudeConstatee}" Width="120"/>
+                                <DataGridTextColumn Header="MOTIF" Binding="{Binding MotifDecision}" Width="*"/>
+                                <DataGridTextColumn Header="COMMISSION" Binding="{Binding CommissionMedicale}" Width="180"/>
+                                <DataGridTextColumn Header="RÉFÉRENCE" Binding="{Binding ReferenceActe}" Width="120"/>
+                                <DataGridTemplateColumn Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.DeleteDecisionCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    Style="{StaticResource BtnDanger}" Content="Suppr." Height="28" Padding="8,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ── J - CONTRÔLE FIN DE SERVICE ── -->
+            <TabItem Header="J – Fin de Service">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Contrôle de Fin de Service" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="DATE DU CONTRÔLE" Style="{StaticResource LblField}"/>
+                                    <DatePicker SelectedDate="{Binding DateControle}" Style="{StaticResource DpField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="MÉDECIN CONTRÔLEUR" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding MedecinControleur}" Style="{StaticResource TxtField}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="APTITUDE FINALE" Style="{StaticResource LblField}"/>
+                                    <ComboBox ItemsSource="{Binding ListeAptitude}"
+                                              SelectedItem="{Binding AptitudeFinal}"
+                                              Style="{StaticResource CbField}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Separator Style="{StaticResource HSeparator}" Margin="0,16"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="BILAN DE SANTÉ" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding BilanSante}" Style="{StaticResource TxtMultiline}" MinHeight="100"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="PATHOLOGIES CHRONIQUES" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding PathologiesChroniques}" Style="{StaticResource TxtMultiline}" MinHeight="100"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="TRAITEMENTS EN COURS" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding TraitementsEnCours}" Style="{StaticResource TxtMultiline}" MinHeight="80"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="RECOMMANDATIONS DE SANTÉ" Style="{StaticResource LblField}"/>
+                                    <TextBox Text="{Binding RecommandationsSante}" Style="{StaticResource TxtMultiline}" MinHeight="80"/>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Margin="0,12,0,0">
+                                <TextBlock Text="CONCLUSION FINALE" Style="{StaticResource LblField}"/>
+                                <TextBox Text="{Binding ConclusionControle}" Style="{StaticResource TxtMultiline}" MinHeight="80"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,12,0,0">
+                                <TextBlock Text="OBSERVATIONS" Style="{StaticResource LblField}"/>
+                                <TextBox Text="{Binding ObservationsControle}" Style="{StaticResource TxtMultiline}" MinHeight="60"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- ═══ STATUS BAR ═══ -->
+        <Border Grid.Row="2" Background="White" BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,1,0,0" Padding="24,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="12"
+                           Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" FontSize="12" Foreground="{StaticResource ErrorBrush}"
+                           Text="{Binding ErrorMessage}" VerticalAlignment="Center"
+                           Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
