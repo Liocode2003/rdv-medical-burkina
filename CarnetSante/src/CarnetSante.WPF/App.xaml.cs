@@ -1,3 +1,4 @@
+using CarnetSante.Core.Models;
 using CarnetSante.Core.Services;
 using CarnetSante.Data.Context;
 using CarnetSante.Data.Repositories;
@@ -33,6 +34,7 @@ public partial class App : Application
         _serviceProvider = services.BuildServiceProvider();
 
         await InitialiserBaseDeDonneesAsync();
+        await CorrigerMotDePasseAdminAsync();
 
         await TenterAutoConnexionAsync();
         OuvrirFenetrePrincipale();
@@ -163,6 +165,31 @@ public partial class App : Application
                 "CarnetSante", "Exports");
 
         return Environment.ExpandEnvironmentVariables(chemin);
+    }
+
+    /// <summary>
+    /// Corrige le hash du mot de passe admin dans la base existante si nécessaire.
+    /// Utile quand le hash seeded ne correspond pas au mot de passe en clair "Admin@2024!".
+    /// </summary>
+    private static async Task CorrigerMotDePasseAdminAsync()
+    {
+        const string motDePasseAdmin = "Admin@2024!";
+        try
+        {
+            using var scope = _serviceProvider!.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<CarnetSanteDbContext>();
+            var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
+
+            var admin = await db.Set<Utilisateur>()
+                .FirstOrDefaultAsync(u => u.Login == "admin");
+
+            if (admin != null && !authService.VerifierMotDePasse(motDePasseAdmin, admin.MotDePasseHash))
+            {
+                admin.MotDePasseHash = authService.HacherMotDePasse(motDePasseAdmin);
+                await db.SaveChangesAsync();
+            }
+        }
+        catch { /* Non bloquant : l'auto-connexion échouera simplement */ }
     }
 
     /// <summary>
