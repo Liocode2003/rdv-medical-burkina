@@ -170,13 +170,6 @@ public partial class App : Application
         var mainWindow = new MainWindow(mainVm,
             () => _serviceProvider!.GetRequiredService<PatientWindow>());
 
-        mainVm.DemanderDeconnexion += () =>
-        {
-            var loginWindow = GetLoginWindow();
-            loginWindow.Show();
-            mainWindow.Close();
-        };
-
         mainWindow.Show();
     }
 
