@@ -16,6 +16,9 @@ public interface IAuthService
     /// <summary>Retourne l'utilisateur actuellement connecté.</summary>
     Utilisateur? UtilisateurCourant { get; }
 
+    /// <summary>Retourne les informations de session de l'utilisateur connecté.</summary>
+    SessionUtilisateur? SessionCourante { get; }
+
     /// <summary>Vérifie si l'utilisateur courant a un rôle suffisant.</summary>
     bool ARole(params CarnetSante.Core.Enums.UserRole[] roles);
 
