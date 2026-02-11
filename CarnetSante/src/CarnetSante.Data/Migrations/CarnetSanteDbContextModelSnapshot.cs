@@ -1024,7 +1024,7 @@ namespace CarnetSante.Data.Migrations
                     {
                         Id = 1,
                         Login = "admin",
-                        MotDePasseHash = "$2a$11$hFld1/jMKcREPGqVYYjde.RM5HWc9SDBIXRSLTWZbq0RBPdxhLOle",
+                        MotDePasseHash = "$2a$11$7xklsTYPa4WpbybbUhaGZeReQJPhUH84r6AqjcKxJO.i/IzIzDL.2",
                         Nom = "Administrateur",
                         Prenom = "Système",
                         Role = 1,
