@@ -64,7 +64,16 @@ public partial class App : Application
             "CarnetSante",
             "carnet_sante.db");
 
-        Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Impossible de créer le répertoire de la base de données : {Path.GetDirectoryName(dbPath)}\n" +
+                $"Vérifiez les droits d'écriture sur le dossier AppData\\Local.", ex);
+        }
 
         bool chiffrementActif = _configuration!.GetValue<bool>("Database:ChiffrementActif");
         string motDePasse = ObtenirMotDePasseBdd();
@@ -129,7 +138,31 @@ public partial class App : Application
     {
         using var scope = _serviceProvider!.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CarnetSanteDbContext>();
-        await db.Database.MigrateAsync();
+        try
+        {
+            await db.Database.MigrateAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                "Échec de l'initialisation de la base de données. " +
+                "Vérifiez que le fichier n'est pas verrouillé par un autre processus " +
+                "et que vous disposez des droits nécessaires.", ex);
+        }
+    }
+
+    /// <summary>
+    /// Résout le chemin du dossier d'export PDF en développant les variables d'environnement
+    /// Windows (ex. %USERPROFILE%) présentes dans la configuration.
+    /// </summary>
+    public static string ObtenirDossierExportPdf()
+    {
+        var chemin = _configuration!.GetValue<string>("PDF:DossierExport")
+            ?? Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "CarnetSante", "Exports");
+
+        return Environment.ExpandEnvironmentVariables(chemin);
     }
 
     public static LoginWindow GetLoginWindow()
