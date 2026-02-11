@@ -307,7 +307,7 @@ public class PdfService : IPdfService
 
         foreach (var op in operations)
         {
-            if (y > HauteurPage - 100) { AjouterPiedDePage(gfx, page.Number); break; }
+            if (y > HauteurPage - 100) { AjouterPiedDePage(gfx, doc.Pages.Count); break; }
 
             gfx.DrawRectangle(XPens.DarkBlue, XBrushes.AliceBlue, MargeGauche, y, LargeurContenu, 16);
             var fontBold = new XFont("Arial", 10, XFontStyle.Bold);
