@@ -209,7 +209,7 @@ public class CarnetSanteDbContext : DbContext
             Id = 1,
             Login = "admin",
             // Hash BCrypt de "Admin@2024!" - à changer à la première connexion
-            MotDePasseHash = "$2a$11$XqBhJzN5Wz0vNcPFqM9VCuJ8K7LmZrT3eYpA1dR4xGsHbWkO6vI2m",
+            MotDePasseHash = "$2a$11$hFld1/jMKcREPGqVYYjde.RM5HWc9SDBIXRSLTWZbq0RBPdxhLOle",
             Nom = "Administrateur",
             Prenom = "Système",
             Role = CarnetSante.Core.Enums.UserRole.Administrateur,
