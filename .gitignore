@@ -1,0 +1,2 @@
+# Ignore zip archives at the root level
+*.zip
