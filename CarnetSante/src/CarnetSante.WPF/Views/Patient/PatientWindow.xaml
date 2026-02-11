@@ -88,6 +88,9 @@
                     <Button Content="🖨️ Imprimer Carnet" Style="{StaticResource ActionButtonStyle}"
                             Command="{Binding ImprimerCarnetCommand}"
                             Background="#1A3A5C" Foreground="White"/>
+                    <Button Content="📥 Exporter PDF" Style="{StaticResource ActionButtonStyle}"
+                            Command="{Binding ExporterPdfCommand}"
+                            Background="#0369A1" Foreground="White"/>
                     <Button Content="Imprimer Section" Style="{StaticResource ActionButtonStyle}"
                             Command="{Binding ImprimerSectionCommand}"
                             CommandParameter="{Binding SelectedTabLetter}"
