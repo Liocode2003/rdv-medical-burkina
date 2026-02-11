@@ -1,7 +1,7 @@
 using CarnetSante.Core.Models;
 using CarnetSante.Core.Services;
 using System.Collections.ObjectModel;
-using Patient = CarnetSante.Core.Models.Patient;
+using PatientModel = CarnetSante.Core.Models.Patient;
 
 namespace CarnetSante.WPF.ViewModels.Dashboard;
 
@@ -32,15 +32,15 @@ public class MainViewModel : BaseViewModel
     }
 
     // ── Propriétés ──────────────────────────────────────────
-    private ObservableCollection<Patient> _patients = new();
-    public ObservableCollection<Patient> Patients
+    private ObservableCollection<PatientModel> _patients = new();
+    public ObservableCollection<PatientModel> Patients
     {
         get => _patients;
         set => SetProperty(ref _patients, value);
     }
 
-    private Patient? _patientSelectionne;
-    public Patient? PatientSelectionne
+    private PatientModel? _patientSelectionne;
+    public PatientModel? PatientSelectionne
     {
         get => _patientSelectionne;
         set => SetProperty(ref _patientSelectionne, value);
@@ -80,7 +80,7 @@ public class MainViewModel : BaseViewModel
     public AsyncRelayCommand DeconnecterCommand { get; }
 
     // Événements de navigation
-    public event Action<Patient?>? OuvrirFichePatient;
+    public event Action<PatientModel?>? OuvrirFichePatient;
     public event Action? DemanderDeconnexion;
 
     // ── Actions ──────────────────────────────────────────────
@@ -90,7 +90,7 @@ public class MainViewModel : BaseViewModel
         try
         {
             var patients = await _patientService.RechercherPatientsAsync();
-            Patients = new ObservableCollection<Patient>(patients);
+            Patients = new ObservableCollection<PatientModel>(patients);
             TotalPatients = Patients.Count;
         }
         catch (Exception ex)
@@ -113,7 +113,7 @@ public class MainViewModel : BaseViewModel
         {
             var résultats = await _patientService.RechercherPatientsAsync(
                 nom: SearchQuery, prenom: SearchQuery, numeroCarnet: SearchQuery);
-            Patients = new ObservableCollection<Patient>(résultats);
+            Patients = new ObservableCollection<PatientModel>(résultats);
         }
         catch (Exception ex) { ErrorMessage = ex.Message; }
         finally { IsLoading = false; }
@@ -128,5 +128,5 @@ public class MainViewModel : BaseViewModel
         DemanderDeconnexion?.Invoke();
     }
 
-    public void OuvrirPatient(Patient patient) => OuvrirFichePatient?.Invoke(patient);
+    public void OuvrirPatient(PatientModel patient) => OuvrirFichePatient?.Invoke(patient);
 }
