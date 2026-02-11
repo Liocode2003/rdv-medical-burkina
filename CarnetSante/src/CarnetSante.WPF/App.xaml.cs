@@ -40,8 +40,11 @@ public partial class App : Application
 
         await InitialiserBaseDeDonneesAsync();
 
-        await TenterAutoConnexionAsync();
-        OuvrirFenetrePrincipale();
+        bool connecte = await TenterAutoConnexionAsync();
+        if (connecte)
+            OuvrirFenetrePrincipale();
+        else
+            OuvrirFenetreDeConnexion();
     }
 
     /// <summary>
@@ -173,17 +176,37 @@ public partial class App : Application
 
     /// <summary>
     /// Tente une connexion automatique avec le compte admin par défaut.
-    /// Retourne true si la connexion a réussi.
+    /// Retourne true si la connexion a réussi, false sinon.
+    /// En cas d'échec, affiche la fenêtre de login comme solution de repli.
     /// </summary>
     private static async Task<bool> TenterAutoConnexionAsync()
     {
+        string? erreur = null;
         try
         {
             var authService = AppServices.GetRequiredService<IAuthService>();
             var utilisateur = await authService.ConnecterAsync("admin", "Admin@2024!");
-            return utilisateur != null;
+            if (utilisateur != null)
+                return true;
+            // ConnecterAsync a retourné null → mot de passe incorrect ou utilisateur introuvable
+            erreur = "Connexion automatique échouée (identifiants invalides).";
         }
-        catch { /* Mot de passe changé ou compte bloqué : afficher le login normalement */ }
+        catch (InvalidOperationException ex)
+        {
+            erreur = ex.Message; // compte bloqué
+        }
+        catch (Exception ex)
+        {
+            erreur = $"Erreur inattendue lors de la connexion automatique :\n{ex.Message}";
+        }
+
+        // Connexion auto impossible → afficher la fenêtre de login
+        MessageBox.Show(
+            $"{erreur}\n\nVeuillez vous connecter manuellement.",
+            "Connexion automatique impossible",
+            MessageBoxButton.OK,
+            MessageBoxImage.Warning);
+
         return false;
     }
 
@@ -194,6 +217,12 @@ public partial class App : Application
             () => AppServices.GetRequiredService<PatientWindow>());
 
         mainWindow.Show();
+    }
+
+    private static void OuvrirFenetreDeConnexion()
+    {
+        var loginWindow = GetLoginWindow();
+        loginWindow.Show();
     }
 
     public static LoginWindow GetLoginWindow()
