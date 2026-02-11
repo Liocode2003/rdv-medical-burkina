@@ -14,8 +14,6 @@ public partial class LoginWindow : Window
         _viewModel = viewModel;
         DataContext = _viewModel;
 
-        _viewModel.ConnexionReussie += OnConnexionReussie;
-
         // Synchronisation PasswordBox (WPF sécurité : pas de binding direct)
         PasswordBox.PasswordChanged += (s, e) =>
             _viewModel.MotDePasse = PasswordBox.Password;
@@ -23,9 +21,5 @@ public partial class LoginWindow : Window
         LoginBox.Focus();
     }
 
-    private void OnConnexionReussie()
-    {
-        DialogResult = true;
-        Close();
-    }
+
 }

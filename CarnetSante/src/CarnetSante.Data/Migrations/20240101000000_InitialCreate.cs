@@ -567,7 +567,7 @@ namespace CarnetSante.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Utilisateurs",
                 columns: new[] { "Id", "Login", "MotDePasseHash", "Nom", "Prenom", "Role", "EstActif", "TentativesEchec", "CreatedAt", "IsDeleted" },
-                values: new object[] { 1, "admin", "$2a$11$XqBhJzN5Wz0vNcPFqM9VCuJ8K7LmZrT3eYpA1dR4xGsHbWkO6vI2m", "Administrateur", "Système", 1, true, 0, new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc), false });
+                values: new object[] { 1, "admin", "$2a$11$hFld1/jMKcREPGqVYYjde.RM5HWc9SDBIXRSLTWZbq0RBPdxhLOle", "Administrateur", "Système", 1, true, 0, new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc), false });
 
             // ── Index : unicité Login ─────────────────────────────────────
             migrationBuilder.CreateIndex(
