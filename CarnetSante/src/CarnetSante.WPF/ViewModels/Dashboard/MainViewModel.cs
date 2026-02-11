@@ -1,4 +1,3 @@
-using CarnetSante.Core.Models;
 using CarnetSante.Core.Services;
 using System.Collections.ObjectModel;
 using Patient = CarnetSante.Core.Models.Patient;
