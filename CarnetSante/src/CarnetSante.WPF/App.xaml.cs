@@ -20,7 +20,12 @@ namespace CarnetSante.WPF;
 public partial class App : Application
 {
     private static IServiceProvider? _serviceProvider;
+    private static IServiceScope? _appScope;
     private static IConfiguration? _configuration;
+
+    // Toujours résoudre les services depuis le scope applicatif pour que
+    // IAuthService (Scoped) soit la même instance dans tout l'application.
+    private static IServiceProvider AppServices => _appScope!.ServiceProvider;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -31,6 +36,7 @@ public partial class App : Application
         var services = new ServiceCollection();
         ConfigureServices(services);
         _serviceProvider = services.BuildServiceProvider();
+        _appScope = _serviceProvider.CreateScope();
 
         await InitialiserBaseDeDonneesAsync();
 
@@ -173,9 +179,7 @@ public partial class App : Application
     {
         try
         {
-            // Résolution directe sur le root provider pour que l'état connecté
-            // soit partagé avec le MainViewModel (même instance scoped-as-singleton en WPF).
-            var authService = _serviceProvider!.GetRequiredService<IAuthService>();
+            var authService = AppServices.GetRequiredService<IAuthService>();
             var utilisateur = await authService.ConnecterAsync("admin", "Admin@2024!");
             return utilisateur != null;
         }
@@ -185,23 +189,23 @@ public partial class App : Application
 
     private static void OuvrirFenetrePrincipale()
     {
-        var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
+        var mainVm = AppServices.GetRequiredService<MainViewModel>();
         var mainWindow = new MainWindow(mainVm,
-            () => _serviceProvider!.GetRequiredService<PatientWindow>());
+            () => AppServices.GetRequiredService<PatientWindow>());
 
         mainWindow.Show();
     }
 
     public static LoginWindow GetLoginWindow()
     {
-        var loginVm = _serviceProvider!.GetRequiredService<LoginViewModel>();
+        var loginVm = AppServices.GetRequiredService<LoginViewModel>();
         var loginWindow = new LoginWindow(loginVm);
 
         loginVm.ConnexionReussie += () =>
         {
-            var mainVm = _serviceProvider!.GetRequiredService<MainViewModel>();
+            var mainVm = AppServices.GetRequiredService<MainViewModel>();
             var mainWindow = new MainWindow(mainVm,
-                () => _serviceProvider!.GetRequiredService<PatientWindow>());
+                () => AppServices.GetRequiredService<PatientWindow>());
             mainWindow.Show();
             loginWindow.Close();
         };
@@ -211,6 +215,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _appScope?.Dispose();
         (_serviceProvider as IDisposable)?.Dispose();
         base.OnExit(e);
     }
