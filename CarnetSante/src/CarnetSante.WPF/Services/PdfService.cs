@@ -2,6 +2,7 @@ using CarnetSante.Core.Models;
 using CarnetSante.Core.Services;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
+using System.IO;
 
 namespace CarnetSante.WPF.Services;
 
@@ -197,7 +198,7 @@ public class PdfService : IPdfService
                     $"{contact.NomComplet} - Tél: {contact.Telephone}", ref y);
         }
 
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionConstantes(PdfDocument doc, List<Constante> constantes)
@@ -251,7 +252,7 @@ public class PdfService : IPdfService
             if (y > HauteurPage - 60) break;
         }
 
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionExamenIncorporation(PdfDocument doc, ExamenIncorporation ei)
@@ -291,7 +292,7 @@ public class PdfService : IPdfService
             ei.AptitudeMedicale.ToString().ToUpper(), ref y);
         AjouterChampTexte(gfx, font, "Mentions spéciales", ei.MentionsMedicalesSpeciales, ref y);
 
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionOperations(PdfDocument doc, List<OperationMedicale> operations)
@@ -326,7 +327,7 @@ public class PdfService : IPdfService
             y += 8;
         }
 
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionVaccinations(PdfDocument doc, List<Vaccination> vaccinations)
@@ -377,7 +378,7 @@ public class PdfService : IPdfService
             if (y > HauteurPage - 60) break;
         }
 
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionVisites(PdfDocument doc, List<VisiteSanitaire> visites)
@@ -403,7 +404,7 @@ public class PdfService : IPdfService
                 AjouterLigneInfo(gfx, font, "Médecin :", v.NomMedecin, ref y);
             y += 5;
         }
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionIndisponibilites(PdfDocument doc, List<Indisponibilite> items)
@@ -429,7 +430,7 @@ public class PdfService : IPdfService
             AjouterChampTexte(gfx, font, "État retour", item.EtatRetour, ref y);
             y += 5;
         }
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionCertificats(PdfDocument doc, List<CertificatMedical> items)
@@ -457,7 +458,7 @@ public class PdfService : IPdfService
                 AjouterLigneInfo(gfx, font, "Fichier joint :", item.FichierNom ?? "Oui", ref y);
             y += 5;
         }
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionDecisionsReforme(PdfDocument doc, List<DecisionReforme> items)
@@ -482,7 +483,7 @@ public class PdfService : IPdfService
             AjouterChampTexte(gfx, font, "Observations", item.Observations, ref y);
             y += 5;
         }
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     private void AjouterSectionControleFinService(PdfDocument doc, ControleFInService controle)
@@ -510,10 +511,16 @@ public class PdfService : IPdfService
             AjouterLigneInfo(gfx, font, "Médecin signataire :", controle.MedecinSignataire, ref y);
         }
 
-        AjouterPiedDePage(gfx, page.Number);
+        AjouterPiedDePage(gfx, doc.Pages.Count);
     }
 
     // ── Helpers de dessin ─────────────────────────────────────
+
+    private static readonly XStringFormat _middleLeft = new XStringFormat
+    {
+        Alignment = XStringAlignment.Near,
+        LineAlignment = XLineAlignment.Center
+    };
 
     private void AjouterEnTetSection(XGraphics gfx, string lettre, string titre, ref double y)
     {
@@ -521,9 +528,9 @@ public class PdfService : IPdfService
         var fontLettre = new XFont("Arial", 20, XFontStyle.Bold);
         gfx.DrawRectangle(XBrushes.DarkBlue, MargeGauche, y, LargeurContenu, 35);
         gfx.DrawString($" {lettre}.", fontLettre, XBrushes.White,
-            new XRect(MargeGauche, y, 50, 35), XStringFormats.MiddleLeft);
+            new XRect(MargeGauche, y, 50, 35), _middleLeft);
         gfx.DrawString(titre, fontTitre, XBrushes.White,
-            new XRect(MargeGauche + 50, y, LargeurContenu - 50, 35), XStringFormats.MiddleLeft);
+            new XRect(MargeGauche + 50, y, LargeurContenu - 50, 35), _middleLeft);
         y += 45;
     }
 

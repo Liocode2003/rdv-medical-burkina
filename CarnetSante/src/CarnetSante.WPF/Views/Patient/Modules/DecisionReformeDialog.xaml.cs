@@ -39,13 +39,13 @@ public partial class DecisionReformeDialog : Window
         }
 
         var decisionTag = (DecisionBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "Maintien";
-        Enums.TypeDecisionReforme decisionEnum = decisionTag switch
+        TypeDecisionReforme decisionEnum = decisionTag switch
         {
-            "RefomeDefinitive"  => Enums.TypeDecisionReforme.RefomeDefinitive,
-            "RefomeTemporaire"  => Enums.TypeDecisionReforme.RefomeTemporaire,
-            "Reengagement"      => Enums.TypeDecisionReforme.Reengagement,
-            "Reclassement"      => Enums.TypeDecisionReforme.Reclassement,
-            _                   => Enums.TypeDecisionReforme.Maintien
+            "RefomeDefinitive"  => TypeDecisionReforme.RefomeDefinitive,
+            "RefomeTemporaire"  => TypeDecisionReforme.RefomeTemporaire,
+            "Reengagement"      => TypeDecisionReforme.Reengagement,
+            "Reclassement"      => TypeDecisionReforme.Reclassement,
+            _                   => TypeDecisionReforme.Maintien
         };
 
         Decision = new DecisionReforme
