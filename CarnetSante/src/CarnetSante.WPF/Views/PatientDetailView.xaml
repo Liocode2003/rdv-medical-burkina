@@ -559,43 +559,27 @@
                         <RowDefinition Height="16"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
+
+                    <!-- Header avec bouton nouvelle visite -->
                     <Border Style="{StaticResource Card}">
-                        <StackPanel>
-                            <TextBlock Text="Nouvelle Visite Sanitaire" Style="{StaticResource SectionHeader}"/>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="130"/>
-                                    <ColumnDefinition Width="12"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="12"/>
-                                    <ColumnDefinition Width="180"/>
-                                    <ColumnDefinition Width="12"/>
-                                    <ColumnDefinition Width="180"/>
-                                    <ColumnDefinition Width="12"/>
-                                    <ColumnDefinition Width="120"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="DATE" Style="{StaticResource LblField}"/>
-                                    <DatePicker SelectedDate="{Binding EditingVisite.DateVisite}" Style="{StaticResource DpField}"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock Text="MOTIF" Style="{StaticResource LblField}"/>
-                                    <TextBox Text="{Binding EditingVisite.Motif}" Style="{StaticResource TxtField}"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="4">
-                                    <TextBlock Text="ÉTABLISSEMENT" Style="{StaticResource LblField}"/>
-                                    <TextBox Text="{Binding EditingVisite.Etablissement}" Style="{StaticResource TxtField}"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="6">
-                                    <TextBlock Text="MÉDECIN TRAITANT" Style="{StaticResource LblField}"/>
-                                    <TextBox Text="{Binding EditingVisite.MedecinTraitant}" Style="{StaticResource TxtField}"/>
-                                </StackPanel>
-                                <Button Grid.Column="8" Command="{Binding SaveVisiteCommand}"
-                                        Style="{StaticResource BtnPrimary}"
-                                        Content="Ajouter" VerticalAlignment="Bottom" Height="38"/>
-                            </Grid>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Visites Sanitaires et Hospitalisations" Style="{StaticResource SectionHeader}"/>
+                                <TextBlock Text="Cliquez sur 'Nouvelle Visite' pour enregistrer un dossier d'hospitalisation complet avec examen physique détaillé."
+                                           FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,-8,0,0"/>
+                            </StackPanel>
+                            <Button Grid.Column="1" Command="{Binding OpenVisiteDialogCommand}"
+                                    Style="{StaticResource BtnPrimary}"
+                                    Content="+ Nouvelle Visite / Hospitalisation"
+                                    VerticalAlignment="Center" Padding="16,10" Height="42"/>
+                        </Grid>
                     </Border>
+
+                    <!-- Liste des visites -->
                     <Border Grid.Row="2" Style="{StaticResource Card}" Padding="0">
                         <DataGrid ItemsSource="{Binding Visites}" SelectedItem="{Binding SelectedVisite}"
                                   Style="{StaticResource ProDataGrid}" BorderThickness="0">
@@ -605,14 +589,21 @@
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Header="MOTIF" Binding="{Binding Motif}" Width="*"/>
                                 <DataGridTextColumn Header="ÉTABLISSEMENT" Binding="{Binding Etablissement}" Width="180"/>
-                                <DataGridTextColumn Header="MÉDECIN" Binding="{Binding MedecinTraitant}" Width="160"/>
-                                <DataGridTextColumn Header="DIAGNOSTIC" Binding="{Binding Diagnostic}" Width="180"/>
+                                <DataGridTextColumn Header="MÉDECIN" Binding="{Binding MedecinTraitant}" Width="140"/>
+                                <DataGridTextColumn Header="DIAGNOSTIC" Binding="{Binding Diagnostic}" Width="160"/>
                                 <DataGridTextColumn Header="DURÉE (j)" Binding="{Binding DureeHospitalisation}" Width="80"/>
-                                <DataGridTemplateColumn Width="80">
+                                <DataGridTemplateColumn Header="ACTIONS" Width="150">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Command="{Binding DataContext.DeleteVisiteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                    Style="{StaticResource BtnDanger}" Content="Suppr." Height="28" Padding="8,2"/>
+                                            <StackPanel Orientation="Horizontal" Margin="4,0">
+                                                <Button Command="{Binding DataContext.OpenVisiteDialogCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                        Style="{StaticResource BtnSecondary}"
+                                                        Content="Voir" Height="28" Padding="8,2" Margin="0,0,4,0"
+                                                        ToolTip="Voir/Modifier le dossier complet"/>
+                                                <Button Command="{Binding DataContext.DeleteVisiteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                        Style="{StaticResource BtnDanger}"
+                                                        Content="Suppr." Height="28" Padding="8,2"/>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>

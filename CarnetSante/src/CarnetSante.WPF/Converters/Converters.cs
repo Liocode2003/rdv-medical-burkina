@@ -54,6 +54,6 @@ public class DecimalToStringConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         => value?.ToString() ?? string.Empty;
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => decimal.TryParse(value?.ToString(), out var d) ? d : (object?)null;
+    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => decimal.TryParse(value?.ToString(), out var d) ? (object?)d : null;
 }

@@ -13,5 +13,17 @@ public class VisiteSanitaire : BaseEntity
     public string Suites { get; set; } = string.Empty;
     public string Observations { get; set; } = string.Empty;
 
+    // Dossier d'hospitalisation détaillé
+    public string HistoireMaladie { get; set; } = string.Empty;
+    public string EtatGeneral { get; set; } = string.Empty;
+    public string ExamenCardiovasculaire { get; set; } = string.Empty;
+    public string ExamenPleuroPulmonaire { get; set; } = string.Empty;
+    public string ExamenDigestif { get; set; } = string.Empty;
+    public string ExamenNeurologique { get; set; } = string.Empty;
+    public string ExamenAutresAppareils { get; set; } = string.Empty;
+    public string ExamensBiologiques { get; set; } = string.Empty;
+    public string ExamensRadiologiques { get; set; } = string.Empty;
+    public string EvolutionClinique { get; set; } = string.Empty;
+
     public Patient? Patient { get; set; }
 }

@@ -411,6 +411,42 @@ public partial class PatientDetailViewModel : BaseViewModel
         EditingVisite = new VisiteSanitaire { PatientId = Patient?.Id ?? 0, DateVisite = DateTime.Now };
 
     [RelayCommand]
+    private void OpenVisiteDialog()
+    {
+        if (Patient == null) return;
+        var visite = SelectedVisite != null
+            ? SelectedVisite
+            : new VisiteSanitaire { PatientId = Patient.Id, DateVisite = DateTime.Now };
+
+        var dialog = new Views.VisiteDialog(visite);
+        if (dialog.ShowDialog() == true && dialog.IsSaved)
+        {
+            _ = SaveVisiteDialogAsync(visite);
+        }
+    }
+
+    private async Task SaveVisiteDialogAsync(VisiteSanitaire visite)
+    {
+        try
+        {
+            visite.PatientId = Patient!.Id;
+            var saved = await _visiteRepo.SaveAsync(visite);
+            if (!Visites.Any(v => v.Id == saved.Id))
+                Visites.Insert(0, saved);
+            else
+            {
+                var idx = Visites.IndexOf(Visites.First(v => v.Id == saved.Id));
+                Visites[idx] = saved;
+            }
+            SelectedVisite = null;
+        }
+        catch (Exception ex)
+        {
+            SetError($"Erreur lors de l'enregistrement: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
     private async Task SaveVisiteAsync()
     {
         if (Patient == null) return;
